@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserProfileRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Validator;
 
 class AuthController extends Controller
@@ -13,24 +15,44 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register() {
-        $validator = Validator::make(request()->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8',
+    // public function register(StoreUserProfileRequest  $request) {
+    //     $validator = Validator::make(request()->all(), [
+    //         'name' => 'required',
+    //         'email' => 'required|email|unique:users',
+    //         'password' => 'required|min:8',
+    //     ]);
+  
+    //     if($validator->fails()){
+    //         return response()->json($validator->errors()->toJson(), 400);
+    //     }
+  
+    //     $user = new User;
+    //     $user->name = request()->name;
+    //     $user->email = request()->email;
+    //     $user->password = bcrypt(request()->password);
+    //     $user->save();
+  
+    //     return response()->json($user, 201);
+    // }
+
+    public function register(StoreUserProfileRequest $request)
+    {
+        // Los datos ya están validados gracias a la Request Class
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password), // Encriptar la contraseña
         ]);
-  
-        if($validator->fails()){
-            return response()->json($validator->errors()->toJson(), 400);
-        }
-  
-        $user = new User;
-        $user->name = request()->name;
-        $user->email = request()->email;
-        $user->password = bcrypt(request()->password);
-        $user->save();
-  
-        return response()->json($user, 201);
+
+        $user->profile()->create([
+            'ci' => $request->ci,
+            'lastName' => $request->lastName,
+            'phone' => $request->phone,
+            'address' => $request->address,
+        ]);
+
+        return response()->json(['message' => 'Usuario registrado correctamente', 'user' => $user], 201); // Código 201 Created
     }
   
   
