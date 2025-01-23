@@ -54,6 +54,8 @@ class AuthController extends Controller
             'address' => $request->address,
         ]);
 
+        $user->assignRole('editor'); // Asigna el rol 'user' por defecto
+
         return response()->json(['message' => 'Usuario registrado correctamente', 'user' => $user], 201); // Código 201 Created
     }
 
@@ -66,13 +68,13 @@ class AuthController extends Controller
     public function login()
     {
 
-        
+
         $credentials = request(['email', 'password']);
-    
+
         if (! $token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-    
+
         return $this->respondWithToken($token);
     }
 
@@ -124,6 +126,8 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
             'user' => new UserResource($user),
+            'roles' => $user->getRoleNames(), // Obtiene los nombres de los roles
+            // 'permissions' => $user->getPermissionsViaRoles(), // Obtiene los permisos a través de los roles
         ]);
     }
 }
