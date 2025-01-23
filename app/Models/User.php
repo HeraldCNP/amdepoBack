@@ -35,6 +35,8 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
+    
+
     /**
      * Get the attributes that should be cast.
      *

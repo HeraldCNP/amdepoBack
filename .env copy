@@ -1,9 +1,9 @@
 APP_NAME=Laravel
-APP_ENV=local
+APP_ENV=production
 APP_KEY=base64:GFByThqxPS0o9j5DvXZIlzOt+pxa+CzK9y4ny4MskG4=
 APP_DEBUG=true
 APP_TIMEZONE=UTC
-APP_URL=http://localhost
+APP_URL=http://test.labsanmartin.com.bo
 
 APP_LOCALE=en
 APP_FALLBACK_LOCALE=en

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserProfileRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Validator;
 
@@ -21,17 +23,17 @@ class AuthController extends Controller
     //         'email' => 'required|email|unique:users',
     //         'password' => 'required|min:8',
     //     ]);
-  
+
     //     if($validator->fails()){
     //         return response()->json($validator->errors()->toJson(), 400);
     //     }
-  
+
     //     $user = new User;
     //     $user->name = request()->name;
     //     $user->email = request()->email;
     //     $user->password = bcrypt(request()->password);
     //     $user->save();
-  
+
     //     return response()->json($user, 201);
     // }
 
@@ -54,8 +56,8 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Usuario registrado correctamente', 'user' => $user], 201); // Código 201 Created
     }
-  
-  
+
+
     /**
      * Get a JWT via given credentials.
      *
@@ -63,15 +65,17 @@ class AuthController extends Controller
      */
     public function login()
     {
+
+        
         $credentials = request(['email', 'password']);
-  
+    
         if (! $token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-  
+    
         return $this->respondWithToken($token);
     }
-  
+
     /**
      * Get the authenticated User.
      *
@@ -79,9 +83,9 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json(auth()->user());
+        return response()->json(new UserResource(auth()->user()));
     }
-  
+
     /**
      * Log the user out (Invalidate the token).
      *
@@ -90,10 +94,10 @@ class AuthController extends Controller
     public function logout()
     {
         auth()->logout();
-  
+
         return response()->json(['message' => 'Successfully logged out']);
     }
-  
+
     /**
      * Refresh a token.
      *
@@ -103,7 +107,7 @@ class AuthController extends Controller
     {
         return $this->respondWithToken(auth()->refresh());
     }
-  
+
     /**
      * Get the token array structure.
      *
@@ -113,10 +117,13 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
+        $user = auth()->user();
+
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'user' => new UserResource($user),
         ]);
     }
 }
