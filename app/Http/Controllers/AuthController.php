@@ -6,36 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserProfileRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator as FacadesValidator;
 use Validator;
 
 class AuthController extends Controller
 {
-    /**
-     * Register a User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    // public function register(StoreUserProfileRequest  $request) {
-    //     $validator = Validator::make(request()->all(), [
-    //         'name' => 'required',
-    //         'email' => 'required|email|unique:users',
-    //         'password' => 'required|min:8',
-    //     ]);
-
-    //     if($validator->fails()){
-    //         return response()->json($validator->errors()->toJson(), 400);
-    //     }
-
-    //     $user = new User;
-    //     $user->name = request()->name;
-    //     $user->email = request()->email;
-    //     $user->password = bcrypt(request()->password);
-    //     $user->save();
-
-    //     return response()->json($user, 201);
-    // }
 
     public function register(StoreUserProfileRequest $request)
     {
@@ -54,7 +32,7 @@ class AuthController extends Controller
             'address' => $request->address,
         ]);
 
-        $user->assignRole('editor'); // Asigna el rol 'user' por defecto
+        $user->assignRole('user'); // Asigna el rol 'user' por defecto
 
         return response()->json(['message' => 'Usuario registrado correctamente', 'user' => $user], 201); // Código 201 Created
     }
@@ -65,16 +43,45 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login()
+    // public function login()
+    // {       
+
+
+    //     $credentials = request(['email', 'password']);
+
+    //     if (! $token = auth()->attempt($credentials)) {
+    //         return response()->json(['error' => 'Credenciales Incorrectas'], 401);
+    //     }
+
+    //     return $this->respondWithToken($token);
+    // }
+
+    public function login(Request $request)
     {
+        // 1. Validar los datos de la petición
+        $validator = FacadesValidator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required',
+        ], [ // Mensajes de error personalizados (opcional pero recomendado)
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El correo electrónico debe ser válido.',
+            'password.required' => 'La contraseña es obligatoria.',
+        ]);
 
-
-        $credentials = request(['email', 'password']);
-
-        if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        // 2. Verificar si la validación falla
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422); // Retorna 422 con los errores
         }
 
+        // 3. Obtener las credenciales (SOLO después de la validación)
+        $credentials = $request->only(['email', 'password']);
+
+        // 4. Intentar la autenticación
+        if (! $token = auth()->attempt($credentials)) {
+            return response()->json(['error' => 'Credenciales Incorrectas'], 401);
+        }
+
+        // 5. Devolver la respuesta con el token
         return $this->respondWithToken($token);
     }
 

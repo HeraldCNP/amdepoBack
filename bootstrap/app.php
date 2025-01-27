@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureRoleExists;
 use Illuminate\Foundation\Application;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -8,13 +9,23 @@ use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // $middleware->alias([
+        //     'role.exists' => EnsureRoleExists::class, // Registra el alias del middleware
+        // ]);
+
+        // Middleware globales (ejecutados en cada petición)
+        // $middleware->prepend(EnsureRoleExists::class); // Ejemplo si fuera global
+
+        // Middleware para grupos (ej. para la API - si lo necesitas)
+        // $middleware->for('api', function (Middleware $middleware) {
+        //     $middleware->push(EnsureRoleExists::class);
+        // });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (AuthenticationException $e, Request $request) {
