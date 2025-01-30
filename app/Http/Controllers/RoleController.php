@@ -9,14 +9,17 @@ use App\Http\Resources\RoleResource;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;
 
 
 class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::with('permissions')->get(); // Carga los permisos con eager loading
+        $roles = Role::with('permissions')
+            ->orderBy('created_at', 'desc') // Ordena por fecha de creación en orden descendente
+            ->get();
+
         return RoleResource::collection($roles);
     }
 
@@ -32,7 +35,6 @@ class RoleController extends Controller
             DB::rollBack();
             dd($e);
             return response()->json(['message' => 'Error al crear el rol: ' . $e->getMessage()], 500);
-            
         }
     }
 

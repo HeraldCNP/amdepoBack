@@ -17,7 +17,12 @@ class RoleResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'permissions' => $this->permissions->pluck('name'), // Obtiene solo los nombres de los permisos.
+            'permissions' => $this->permissions->map(function ($permission) {
+                return [
+                    'name' => $permission->name,
+                    'description' => $permission->description,
+                ];
+            })->toArray(), // Convierte la colección a un array plano
         ];
     }
 }
