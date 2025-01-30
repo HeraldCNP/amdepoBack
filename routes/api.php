@@ -11,6 +11,7 @@ Route::group([
     'prefix' => 'auth'
 ], function ($router) {
     // Rutas públicas (sin autenticación)
+    Route::get('/prueba', [AuthController::class, 'prueba'])->name('prueba');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     // Rutas que requieren autenticación (token JWT)

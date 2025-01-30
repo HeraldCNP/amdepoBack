@@ -37,6 +37,9 @@ class AuthController extends Controller
         return response()->json(['message' => 'Usuario registrado correctamente', 'user' => $user], 201); // Código 201 Created
     }
 
+    public function prueba(){
+        return response()->json(['message' => 'prueba'], 200);
+    }
 
     /**
      * Get a JWT via given credentials.
