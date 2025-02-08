@@ -19,8 +19,24 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'created_at' => $this->created_at->toDateTimeString(), // Ejemplo de formato
-            // ... otros atributos seguros
+            'created_at' => $this->created_at->toDateTimeString(),
+            'profile' => $this->whenLoaded('profile', function () { // Carga condicional
+                return [
+                    'lastName' => $this->profile->lastName,
+                    'ci' => $this->profile->ci,
+                    'phone' => $this->profile->phone,
+                    'address' => $this->profile->address,
+                    // ... otros campos de UserProfile
+                ];
+            }),
+            'roles' => $this->whenLoaded('roles', function () {
+                return $this->roles->map(function ($role) {
+                    return [
+                        'id' => $role->id,
+                        'name' => $role->name,
+                    ];
+                })->toArray();
+            }),
         ];
     }
 }

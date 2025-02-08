@@ -26,7 +26,7 @@ class StoreUserProfileRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'], // Validación única para el email
-            'password' => ['required', 'string', 'min:8', 'confirmed'], 
+            'password' => ['required', 'string', 'min:8'], 
             'lastName' => ['required', 'string', 'max:255'], 
             'ci' => ['required', 'string', 'min:7', 'max:12'], // Ejemplo de validación para ci
             'phone' => ['nullable', 'string', 'max:11'], // Ejemplo de validación para teléfono

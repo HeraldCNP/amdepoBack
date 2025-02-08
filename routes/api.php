@@ -7,17 +7,31 @@ use App\Http\Controllers\RoleController;
 
 
 Route::group([
-    'middleware' => 'api', // Middleware principal para la API
+    'middleware' => 'api', // Middleware principal para la API (puede incluir throttling, etc.)
     'prefix' => 'auth'
 ], function ($router) {
     // Rutas públicas (sin autenticación)
     Route::get('/prueba', [AuthController::class, 'prueba'])->name('prueba');
-    Route::post('/register', [AuthController::class, 'register'])->name('register');
+    // Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
-    // Rutas que requieren autenticación (token JWT)
+});
+
+// Rutas protegidas (requieren autenticación JWT)
+Route::group([
+    'middleware' => ['api', 'auth:api'], // 'auth:api' es el middleware JWT
+    'prefix' => 'auth' // Puedes usar un prefijo diferente para las rutas protegidas
+], function ($router) {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/refresh', [AuthController::class, 'refresh'])->name('refresh');
-    Route::post('/me', [AuthController::class, 'me'])->name('me');
+    Route::get('/me', [AuthController::class, 'me'])->name('me');
+
+    // Rutas CRUD de usuarios (protegidas)
+    Route::get('/users', [AuthController::class, 'index'])->name('users.index');
+    Route::patch('/users/{id}', [AuthController::class, 'update'])->name('users.update'); // O PATCH
+    Route::post('/users/register', [AuthController::class, 'register'])->name('users.register');
+    Route::get('/users/{id}', [AuthController::class, 'show'])->name('users.show');
+    Route::delete('/users/{id}', [AuthController::class, 'destroy'])->name('users.destroy');
+    Route::get('/user/search', [AuthController::class, 'searchUsers']);
 });
 
 Route::group([
@@ -36,6 +50,3 @@ Route::group([
     Route::get('/permissions', [RoleController::class, 'getAllPermissions']);
     Route::post('roles/{role}/permissions', [RoleController::class, 'assignPermissions'])->name('roles.assignPermissions');
 });
-
-
-
