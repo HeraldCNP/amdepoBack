@@ -50,3 +50,17 @@ Route::group([
     Route::get('/permissions', [RoleController::class, 'getAllPermissions']);
     Route::post('roles/{role}/permissions', [RoleController::class, 'assignPermissions'])->name('roles.assignPermissions');
 });
+
+// Rutas protegidas (requieren autenticación JWT)
+Route::group([
+    'middleware' => ['api', 'auth:api'], // 'auth:api' es el middleware JWT
+    'prefix' => 'admin' // Puedes usar un prefijo diferente para las rutas protegidas
+], function ($router) {
+    // Rutas CRUD de usuarios (protegidas)
+    Route::get('/municipios', [AuthController::class, 'index'])->name('municipios.index');
+    Route::patch('/municipios/{id}', [AuthController::class, 'update'])->name('municipios.update'); // O PATCH
+    Route::post('/municipios/register', [AuthController::class, 'register'])->name('municipios.register');
+    Route::get('/municipios/{id}', [AuthController::class, 'show'])->name('municipios.show');
+    Route::delete('/municipios/{id}', [AuthController::class, 'destroy'])->name('municipios.destroy');
+    Route::get('/municipios/search', [AuthController::class, 'searchUsers']);
+});
