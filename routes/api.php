@@ -3,6 +3,7 @@
 use App\Http\Controllers\admin\MunicipioController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\RoleController;
 
 
@@ -65,3 +66,13 @@ Route::group([
     Route::delete('/municipios/{id}', [MunicipioController::class, 'destroy'])->name('municipios.destroy');
     Route::get('/municipios/search', [MunicipioController::class, 'searchUsers']);
 });
+
+Route::group([
+    'middleware' => ['api', 'auth:api'], // 'auth:api' es el middleware JWT
+    'prefix' => 'admin' // Puedes usar un prefijo diferente para las rutas protegidas
+], function ($router) {
+    // Rutas de documentos (protegidas)
+    Route::post('/municipios/{slug}/documentos', [DocumentoController::class, 'subir']); // Subir un documento
+    Route::get('/municipios/{municipioId}/documentos', [DocumentoController::class, 'listar']); // Listar los documentos de un municipio
+    Route::delete('/documentos/{id}', [DocumentoController::class, 'eliminar']); // Eliminar un documento
+});     
