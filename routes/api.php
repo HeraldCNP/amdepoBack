@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\MunicipioController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
@@ -57,10 +58,10 @@ Route::group([
     'prefix' => 'admin' // Puedes usar un prefijo diferente para las rutas protegidas
 ], function ($router) {
     // Rutas CRUD de usuarios (protegidas)
-    Route::get('/municipios', [AuthController::class, 'index'])->name('municipios.index');
-    Route::patch('/municipios/{id}', [AuthController::class, 'update'])->name('municipios.update'); // O PATCH
-    Route::post('/municipios/register', [AuthController::class, 'register'])->name('municipios.register');
-    Route::get('/municipios/{id}', [AuthController::class, 'show'])->name('municipios.show');
-    Route::delete('/municipios/{id}', [AuthController::class, 'destroy'])->name('municipios.destroy');
-    Route::get('/municipios/search', [AuthController::class, 'searchUsers']);
+    Route::get('/municipios', [MunicipioController::class, 'index'])->name('municipios.index');
+    Route::patch('/municipios/{id}', [MunicipioController::class, 'update'])->name('municipios.update'); // O PATCH
+    Route::post('/municipios/register', [MunicipioController::class, 'store'])->name('municipios.register');
+    Route::get('/municipios/{slug}', [MunicipioController::class, 'show'])->name('municipios.show');
+    Route::delete('/municipios/{id}', [MunicipioController::class, 'destroy'])->name('municipios.destroy');
+    Route::get('/municipios/search', [MunicipioController::class, 'searchUsers']);
 });

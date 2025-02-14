@@ -9,6 +9,11 @@ class Municipio extends Model
 {
     use HasFactory;
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     protected $fillable = [
         'nombre',
         'descripcion',
@@ -25,6 +30,7 @@ class Municipio extends Model
         'alcalde_nombre',
         'alcalde_foto',
         'alcalde_descripcion',
+        'slug',
         'user_id',
     ];
 
