@@ -74,5 +74,6 @@ Route::group([
     // Rutas de documentos (protegidas)
     Route::post('/municipios/{slug}/documentos', [DocumentoController::class, 'subir']); // Subir un documento
     Route::get('/municipios/{municipioId}/documentos', [DocumentoController::class, 'listar']); // Listar los documentos de un municipio
+    Route::get('/documentos', [DocumentoController::class, 'listarTodos']); // Listar los documentos de un municipio
     Route::delete('/documentos/{id}', [DocumentoController::class, 'eliminar']); // Eliminar un documento
 });     

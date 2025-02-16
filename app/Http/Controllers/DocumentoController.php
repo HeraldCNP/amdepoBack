@@ -48,6 +48,20 @@ class DocumentoController extends Controller
         }
     }
 
+    public function listarTodos(): JsonResponse
+    {
+        try {
+            $documentos = Documento::with(['municipio'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+
+            return response()->json($documentos);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Error al listar los documentos.', 'message' => $e->getMessage()], 500);
+        }
+    }
+
     public function listar($municipioId): JsonResponse
     {
         try {
