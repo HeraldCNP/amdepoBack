@@ -1,21 +1,22 @@
 <?php
 
+use App\Http\Controllers\admin\DocumentoController;
 use App\Http\Controllers\admin\MunicipioController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DocumentoController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 
 
 
 Route::group([
     'middleware' => 'api', // Middleware principal para la API (puede incluir throttling, etc.)
-    'prefix' => 'auth'
 ], function ($router) {
     // Rutas públicas (sin autenticación)
     Route::get('/prueba', [AuthController::class, 'prueba'])->name('prueba');
     // Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::get('/documentos', [HomeController::class, 'allDocumentos']); // Listar los documentos de un municipio
 });
 
 // Rutas protegidas (requieren autenticación JWT)
