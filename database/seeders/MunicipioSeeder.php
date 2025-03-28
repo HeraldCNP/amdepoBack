@@ -53,6 +53,111 @@ class MunicipioSeeder extends Seeder
                 'user_id' => 1, // ID del usuario que crea el municipio (debes tener usuarios en tu tabla users)
                 'slug' => Str::slug('Chaqui'), // Genera el slug a partir del nombre
             ],
+            [
+                'nombre' => 'Colcha "K"',
+            ],
+            [
+                'nombre' => 'LLica',
+            ],
+            [
+                'nombre' => 'Mojinete',
+            ],
+            [
+                'nombre' => 'Porco',
+            ],
+            [
+                'nombre' => 'San Agustin',
+            ],
+            [
+                'nombre' => 'San Antonio de Esmoruco',
+            ],
+            [
+                'nombre' => 'San Pablo de Lipez',
+            ],
+            [
+                'nombre' => 'San Pedro de Quemes',
+            ],
+            [
+                'nombre' => 'Tahua',
+            ],
+            [
+                'nombre' => 'Tomave',
+            ],
+            [
+                'nombre' => 'Uyuni',
+            ],
+            [
+                'nombre' => 'Atocha',
+            ],
+            [
+                'nombre' => 'Cotagaita',
+            ],
+            [
+                'nombre' => 'Tupiza',
+            ],
+            [
+                'nombre' => 'Villazon',
+            ],
+            [
+                'nombre' => 'Vitichi',
+            ],
+            [
+                'nombre' => 'Uncia',
+            ],
+            [
+                'nombre' => 'Caripuyo',
+            ],
+            [
+                'nombre' => 'Chayanta',
+            ],
+            [
+                'nombre' => 'Chuquihuta',
+            ],
+            [
+                'nombre' => 'Colquechaca',
+            ],
+            [
+                'nombre' => 'LLallagua',
+            ],
+            [
+                'nombre' => 'Pocoata',
+            ],
+            [
+                'nombre' => 'Ravelo',
+            ],
+            [
+                'nombre' => 'San Pedro de Macha',
+            ],
+            [
+                'nombre' => 'Sacaca',
+            ],
+            [
+                'nombre' => 'Acasio',
+            ],
+            [
+                'nombre' => 'Belen de Urmiri',
+            ],
+            [
+                'nombre' => 'Caiza "D"',
+            ],
+            [
+                'nombre' => 'Ckochas',
+            ],
+            [
+                'nombre' => 'Potosí',
+            ],
+            [
+                'nombre' => 'Puna',
+            ],
+            [
+                'nombre' => 'Tacobamba',
+            ],
+            [
+                'nombre' => 'Tinguipaya',
+            ],
+            [
+                'nombre' => 'Yocalla',
+            ],
             // Añade más municipios aquí...
         ];
 
