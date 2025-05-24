@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->text('descripcion')->nullable();
+            $table->string('provincia')->nullable();
             $table->string('slug')->unique();
             $table->string('direccion')->nullable();
             $table->string('telefono')->nullable();
@@ -29,7 +30,12 @@ return new class extends Migration
             $table->string('gentilicio')->nullable();
             $table->string('alcalde_nombre')->nullable();
             $table->string('alcalde_foto')->nullable();
-            $table->text('alcalde_descripcion')->nullable();
+            $table->string('circuscripcion')->nullable();
+            $table->string('comunidades')->nullable();
+            $table->string('aniversario')->nullable();
+            $table->string('fiestaPatronal')->nullable();
+            $table->text('ferias')->nullable();
+            $table->string('facebook')->nullable();
             $table->foreignIdFor(User::class)->constrained()->onDelete('cascade');
             $table->timestamps();
         });

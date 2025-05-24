@@ -16,23 +16,56 @@ class MunicipioSeeder extends Seeder
     {
         $municipios = [
             [
-                'nombre' => 'Betanzos',
-                'descripcion' => 'Municipio ubicado en el departamento de Potosí, Bolivia.',
-                'direccion' => 'Plaza Principal, Betanzos',
-                'telefono' => '+591 12345678',
-                'email' => 'info@Betanzos.gob.bo',
-                'sitio_web' => 'www.gambetanzos.gob.bo',
-                'latitud' => -18.123456,
-                'longitud' => -65.789012,
-                'poblacion' => 5000,
-                'superficie' => 200.50,
-                'historia' => 'Betanzos tiene una rica historia...',
-                'gentilicio' => 'Betanzeños',
-                'alcalde_nombre' => 'Juan Pérez',
-                'alcalde_foto' => 'alcalde.jpg',
-                'alcalde_descripcion' => 'El alcalde actual de Betanzos...',
-                'user_id' => 1, // ID del usuario que crea el municipio (debes tener usuarios en tu tabla users)
-                'slug' => Str::slug('Betanzos'), // Genera el slug a partir del nombre
+                'nombre' => 'Potosí',
+                'descripcion' => 'Ciudad colonial y capital del departamento de Potosí, famosa por su riqueza minera en la época de la colonia y su Cerro Rico.',
+                'provincia' => 'Tomás Frías',
+                'slug' => Str::slug('Potosi'),
+                'circuscripcion' => 'Circunscripción 36',
+                'comunidades' => 'Cantumarca, San Pedro, La Banda',
+                'aniversario' => '10-11',
+                'fiestaPatronal' => '15-08',
+                'ferias' => 'Feria Artesanal, Feria del Libro (ejemplo)',
+                'direccion' => 'Plaza 10 de Noviembre, Potosí',
+                'telefono' => '+591 2 6222222',
+                'email' => 'gob.mun.potosi@gmail.com',
+                'sitio_web' => 'www.potosi.gob.bo',
+                'facebook' => 'https://www.facebook.com/PotosiGob/',
+                'latitud' => -19.5222,
+                'longitud' => -65.7533,
+                'poblacion' => 240000,
+                'superficie' => 1182.2,
+                'historia' => 'Fundada en 1545, Potosí fue una de las ciudades más grandes y ricas del mundo gracias a la plata del Cerro Rico, declarado Patrimonio de la Humanidad por la UNESCO.',
+                'gentilicio' => 'Potosinos',
+                'alcalde_nombre' => 'Jhonny Mamani',
+                'alcalde_foto' => 'alcalde_jhonny_mamani.jpg',
+                'user_id' => 1,
+
+            ],
+            [
+                'nombre' => 'Belen de Urmiri',
+                'descripcion' => 'Ciudad colonial y capital del departamento de Potosí, famosa por su riqueza minera en la época de la colonia y su Cerro Rico.',
+                'slug' => Str::slug('Belen de Urmiri'),
+                'provincia' => 'Tomás Frías', // Nuevo campo
+                'circuscripcion' => '36', // Nuevo campo (ejemplo)
+                'comunidades' => '31 comunidades', // Nuevo campo (ejemplo)
+                'aniversario' => '10 de noviembre de 1993',
+                'fiestaPatronal' => '8 de septiembre Festividad de la Virgen de Guadalupe',
+                'ferias' => '12 y 13 de junio Expo Feria Municipal Agro Camelido y Cultural de Belen de Urmiri', // Nuevo campo
+                'direccion' => 'Carretera hacia Oruro. Edificio Oficinas de la alcaldía s/n. Comunidad Belen de Urmiri a una hora y media de la ciudad de Potosí',
+                'telefono' => '+591 72375165',
+                'email' => 'quispemartin427@gmail.com',
+                'sitio_web' => '',
+                'facebook' => 'https://www.facebook.com/profile.php?id=61561120649222',
+                'latitud' => -19.5222, // Latitud aproximada de Potosí
+                'longitud' => -65.7533, // Longitud aproximada de Potosí
+                'poblacion' => 240000, // Población estimada
+                'superficie' => 1182.2, // Superficie aproximada en km²
+                'historia' => '',
+                'gentilicio' => '',
+                'alcalde_nombre' => 'Martin Quispe Mamani',
+                'alcalde_foto' => 'alcalde_jhonny_mamani.jpg',
+                'user_id' => 1,
+
             ],
             [
                 'nombre' => 'Chaqui',
@@ -49,14 +82,13 @@ class MunicipioSeeder extends Seeder
                 'gentilicio' => 'Chaqueños',
                 'alcalde_nombre' => 'Juan Pérez',
                 'alcalde_foto' => 'alcalde.jpg',
-                'alcalde_descripcion' => 'El alcalde actual de Chaqui...',
                 'user_id' => 1, // ID del usuario que crea el municipio (debes tener usuarios en tu tabla users)
                 'slug' => Str::slug('Chaqui'), // Genera el slug a partir del nombre
             ],
             [
                 'nombre' => 'Colcha "K"',
                 'slug' => Str::slug('Colcha "K"'),
-                'user_id' => 1, 
+                'user_id' => 1,
             ],
             [
                 'nombre' => 'LLica',
@@ -189,11 +221,6 @@ class MunicipioSeeder extends Seeder
                 'user_id' => 1,
             ],
             [
-                'nombre' => 'Belen de Urmiri',
-                'slug' => Str::slug('Belen de Urmiri'),
-                'user_id' => 1,
-            ],
-            [
                 'nombre' => 'Caiza "D"',
                 'slug' => Str::slug('Caiza "D"'),
                 'user_id' => 1,
@@ -201,11 +228,6 @@ class MunicipioSeeder extends Seeder
             [
                 'nombre' => 'Ckochas',
                 'slug' => Str::slug('Ckochas'),
-                'user_id' => 1,
-            ],
-            [
-                'nombre' => 'Potosí',
-                'slug' => Str::slug('Potosí'),
                 'user_id' => 1,
             ],
             [
