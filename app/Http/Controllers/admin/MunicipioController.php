@@ -5,13 +5,16 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\municipio\StoreMunicipioRequest;
 use App\Http\Requests\municipio\UpdateMunicipioRequest;
-use App\Http\Requests\MunicipioRequest;
 use App\Models\Municipio;
 use Exception;
+
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException; // Importa la excepción ModelNotFoundException
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class MunicipioController extends Controller
 {
@@ -19,8 +22,8 @@ class MunicipioController extends Controller
     {
 
         try {
-            // $municipios = Municipio::all(); // O Municipio::paginate(15);
-            $municipios = Municipio::select('id', 'nombre', 'slug')->get();
+            $municipios = Municipio::all(); // O Municipio::paginate(15);
+            // $municipios = Municipio::select('id', 'nombre', 'slug')->get();
 
             return response()->json([
                 'message' => 'Municipios recuperados exitosamente.',
@@ -40,10 +43,29 @@ class MunicipioController extends Controller
 
     public function store(StoreMunicipioRequest $request): JsonResponse
     {
-        // StoreMunicipioRequest ya maneja la validación y errores 422.
-        // Aquí solo capturamos errores que puedan ocurrir durante la creación en DB.
         try {
-            $municipio = Municipio::create($request->validated());
+            $validatedData = $request->validated();
+
+            if ($request->hasFile('alcalde_foto')) {
+
+                // Generar el nombre del archivo basado en el nombre del alcalde
+                $alcaldeNombre = Str::slug($validatedData['alcalde_nombre'] ?? 'sin-nombre');
+                $extension = $request->file('alcalde_foto')->getClientOriginalExtension();
+                $imageName = $alcaldeNombre . '-' . time() . '.' . $extension;
+
+                // Guardar la nueva foto con el nombre generado
+                $imagePath = $request->file('alcalde_foto')->storeAs('municipios/alcaldes', $imageName, 'public');
+                $validatedData['alcalde_foto'] = $imagePath;
+            }
+
+            // --- ASIGNAR user_id DEL USUARIO LOGUEADO ---
+            $validatedData['user_id'] = Auth::id(); // O auth()->id();
+            $validatedData['slug'] = Str::slug($validatedData['nombre']);
+            // Si el user_id ya está en fillable y no quieres enviarlo en el request,
+            // esta es la forma correcta de asignarlo.
+            // --- FIN ASIGNAR user_id ---
+
+            $municipio = Municipio::create($validatedData);
 
             return response()->json([
                 'message' => 'Municipio creado exitosamente.',
@@ -72,21 +94,51 @@ class MunicipioController extends Controller
 
     public function update(UpdateMunicipioRequest $request, Municipio $municipio): JsonResponse
     {
-        // UpdateMunicipioRequest ya maneja la validación y errores 422.
         try {
-            $municipio->update($request->validated());
+            // Obtén los datos ya validados por el FormRequest
+            $validatedData = $request->validated();
+
+            // Lógica para manejar la foto (eliminar la anterior y guardar la nueva)
+            if ($request->hasFile('alcalde_foto')) {
+                // Eliminar foto antigua si existe
+                if ($municipio->alcalde_foto) {
+                    if (Storage::disk('public')->exists($municipio->alcalde_foto)) {
+                        Storage::disk('public')->delete($municipio->alcalde_foto);
+                    }
+                }
+
+                // Generar el nombre del archivo basado en el nombre del alcalde
+                $alcaldeNombre = Str::slug($validatedData['alcalde_nombre'] ?? 'sin-nombre');
+                $extension = $request->file('alcalde_foto')->getClientOriginalExtension();
+                $imageName = $alcaldeNombre . '-' . time() . '.' . $extension;
+
+                // Guardar la nueva foto con el nombre generado
+                $imagePath = $request->file('alcalde_foto')->storeAs('municipios/alcaldes', $imageName, 'public');
+                $validatedData['alcalde_foto'] = $imagePath;
+            } elseif (array_key_exists('alcalde_foto', $request->all()) && is_null($request->input('alcalde_foto'))) {
+                // Si 'alcalde_foto' se envió pero su valor es null, el cliente quiere eliminar la foto.
+                if ($municipio->alcalde_foto) {
+                    if (Storage::disk('public')->exists($municipio->alcalde_foto)) {
+                        Storage::disk('public')->delete($municipio->alcalde_foto);
+                    }
+                }
+                $validatedData['alcalde_foto'] = null;
+            } else {
+                // Si no se envió una nueva imagen y no se pidió eliminar,
+                // asegúrate de que el valor existente se mantenga en $validatedData.
+                $validatedData['alcalde_foto'] = $municipio->alcalde_foto;
+            }
+
+            // Actualizar el municipio con los datos validados
+            $municipio->update($validatedData);
 
             return response()->json([
                 'message' => 'Municipio actualizado exitosamente.',
                 'data' => $municipio
             ], 200);
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'message' => 'Municipio no encontrado para actualizar.',
-                'error' => $e->getMessage()
-            ], 404);
         } catch (Exception $e) {
-            Log::error('Error al actualizar municipio: ' . $e->getMessage());
+            // Se mantiene el log de error para capturar excepciones inesperadas en producción.
+            Log::error('Error al actualizar municipio: ' . $e->getMessage(), ['exception' => $e]);
 
             return response()->json([
                 'message' => 'Ocurrió un error al intentar actualizar el municipio.',
@@ -95,15 +147,35 @@ class MunicipioController extends Controller
         }
     }
 
-    public function destroy($id): JsonResponse
+
+
+    public function destroy(Municipio $municipio): JsonResponse
     {
         try {
-            $municipio = Municipio::findOrFail($id);
+            // 1. Eliminar la foto del alcalde si existe
+            if ($municipio->alcalde_foto) {
+                if (Storage::disk('public')->exists($municipio->alcalde_foto)) {
+                    Storage::disk('public')->delete($municipio->alcalde_foto);
+                    // Opcional: Logear que la foto fue eliminada, si es muy importante para tu monitoreo.
+                    // \Illuminate\Support\Facades\Log::info('Foto de alcalde eliminada para el municipio ' . $municipio->id . ': ' . $municipio->alcalde_foto);
+                }
+            }
+
+            // 2. Eliminar el registro del municipio de la base de datos
             $municipio->delete();
 
-            return response()->json(['message' => 'Municipio eliminado correctamente'], 410);
-        } catch (\Throwable $e) {
-            return response()->json(['error' => 'Error al eliminar el municipio.', 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Municipio eliminado exitosamente.',
+                'data' => null // No hay datos que devolver después de una eliminación exitosa
+            ], 200);
+        } catch (Exception $e) {
+            // Captura cualquier excepción inesperada durante el proceso de eliminación.
+            Log::error('Error al eliminar municipio: ' . $e->getMessage(), ['exception' => $e, 'municipio_id' => $municipio->id]);
+
+            return response()->json([
+                'message' => 'Ocurrió un error al intentar eliminar el municipio.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CircularController;
 use App\Http\Controllers\admin\DocumentoController;
 use App\Http\Controllers\admin\MunicipioController;
 use Illuminate\Support\Facades\Route;
@@ -55,17 +56,21 @@ Route::group([
 });
 
 // Rutas protegidas (requieren autenticación JWT)
+// Rutas protegidas (requieren autenticación JWT)
 Route::group([
-    'middleware' => ['api', 'auth:api'], // 'auth:api' es el middleware JWT
-    'prefix' => 'admin' // Puedes usar un prefijo diferente para las rutas protegidas
+    'middleware' => ['api', 'auth:api'],
+    'prefix' => 'admin'
 ], function ($router) {
-    // Rutas CRUD de usuarios (protegidas)
-    Route::get('/municipios', [MunicipioController::class, 'index'])->name('municipios.index');
-    Route::patch('/municipios/{id}', [MunicipioController::class, 'update'])->name('municipios.update'); // O PATCH
+    // Primero las rutas con slugs/parámetros fijos o "más específicos"
+    Route::get('/municipios/search', [MunicipioController::class, 'searchUsers']); // Mueve esta arriba
     Route::post('/municipios/register', [MunicipioController::class, 'store'])->name('municipios.register');
-    Route::get('/municipios/{slug}', [MunicipioController::class, 'show'])->name('municipios.show');
-    Route::delete('/municipios/{id}', [MunicipioController::class, 'destroy'])->name('municipios.destroy');
-    Route::get('/municipios/search', [MunicipioController::class, 'searchUsers']);
+
+    // Luego las rutas con parámetros de modelo comodín {municipio}
+    Route::get('/municipios', [MunicipioController::class, 'index'])->name('municipios.index');
+    // Route::patch('/municipios/{municipio}', [MunicipioController::class, 'update'])->name('municipios.update');
+    Route::patch('municipios/{municipio}', [MunicipioController::class, 'update'])->middleware('force.form.data'); // <-- ¡Aquí aplicamos el middleware!
+    Route::get('/municipios/{municipio}', [MunicipioController::class, 'show'])->name('municipios.show');
+    Route::delete('/municipios/{municipio}', [MunicipioController::class, 'destroy'])->name('municipios.destroy');
 });
 
 Route::group([
@@ -77,4 +82,19 @@ Route::group([
     Route::get('/municipios/{municipioId}/documentos', [DocumentoController::class, 'listar']); // Listar los documentos de un municipio
     Route::get('/documentos', [DocumentoController::class, 'listarTodos']); // Listar los documentos de un municipio
     Route::delete('/documentos/{id}', [DocumentoController::class, 'eliminar']); // Eliminar un documento
-});     
+});
+
+Route::group([
+    'middleware' => ['api', 'auth:api'],
+    'prefix' => 'admin'
+], function ($router) {
+    // Primero las rutas con slugs/parámetros fijos o "más específicos"
+    // Route::get('/circulares/search', [CircularController::class, 'searchUsers']);
+    Route::post('/circulares/register', [CircularController::class, 'store'])->name('circulares.register');
+
+    // Luego las rutas con parámetros de modelo comodín {municipio}
+    Route::get('/circulares', [CircularController::class, 'index'])->name('circulares.index');
+    Route::patch('/circulares/{id}', [CircularController::class, 'update'])->name('circulares.update');
+    Route::get('/circulares/{id}', [CircularController::class, 'show'])->name('circulares.show');
+    Route::delete('/circulares/{id}', [CircularController::class, 'eliminar'])->name('circulares.destroy');
+});

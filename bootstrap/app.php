@@ -15,9 +15,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->api(prepend: [
+            // Aquí es donde añadimos nuestro middleware
+            // \App\Http\Middleware\ForceFormDataParse::class,
+        ]);
         // $middleware->alias([
         //     'role.exists' => EnsureRoleExists::class, // Registra el alias del middleware
         // ]);
+
+        // Define tus aliases de middleware aquí:
+        $middleware->alias([
+            // 'auth' => \App\Http\Middleware\Authenticate::class, // Ejemplo de alias de auth
+            'force.form.data' => \App\Http\Middleware\ForceFormDataParse::class, // <-- ¡Añade esta línea!
+        ]);
+
 
         // Middleware globales (ejecutados en cada petición)
         // $middleware->prepend(EnsureRoleExists::class); // Ejemplo si fuera global

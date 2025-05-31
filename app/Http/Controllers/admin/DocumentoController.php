@@ -8,6 +8,7 @@ use App\Models\Documento;
 use App\Models\Municipio;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str; // Importa la clase Str para generar slugs y cadenas aleatorias
 
@@ -25,7 +26,7 @@ class DocumentoController extends Controller
             $archivo = $request->file('archivo');
 
             // Genera un nombre de archivo personalizado con una cadena aleatoria
-            $fecha = now()->format('YmdHis');
+            $fecha = now()->format('dmYHis');
             $tituloSlug = Str::slug($validatedData['titulo']);
             $cadenaAleatoria = Str::random(5); // Genera una cadena aleatoria de 5 caracteres
             $nombreArchivo = $tituloSlug . '-' . $fecha . '-' . $cadenaAleatoria . '.' . $archivo->getClientOriginalExtension(); // Concatena la cadena aleatoria
@@ -40,7 +41,7 @@ class DocumentoController extends Controller
                 'descripcion' => $validatedData['descripcion'] ?? null,
                 'ruta_archivo' => $rutaArchivo,
                 'tipo_archivo' => $archivo->getClientMimeType(),
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return response()->json($documento, 201);

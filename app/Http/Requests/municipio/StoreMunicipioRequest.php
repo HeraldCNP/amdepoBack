@@ -5,6 +5,7 @@ namespace App\Http\Requests\municipio;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class StoreMunicipioRequest extends FormRequest
@@ -17,7 +18,8 @@ class StoreMunicipioRequest extends FormRequest
         // Define aquí la lógica de autorización.
         // Por ejemplo, solo los usuarios autenticados pueden crear municipios.
         // return auth()->check();
-        return true; // Por ahora, lo dejamos en true para facilitar pruebas.
+        // return true;
+        return Auth::check();
     }
 
     /**
@@ -27,6 +29,8 @@ class StoreMunicipioRequest extends FormRequest
      */
     public function rules(): array
     {
+        // dd($this->all());
+
         return [
             'nombre' => ['required', 'string', 'max:255', 'unique:municipios,nombre'],
             'descripcion' => ['nullable', 'string'], // 'text' en DB se mapea a 'string' en validación
@@ -43,14 +47,13 @@ class StoreMunicipioRequest extends FormRequest
             'historia' => ['nullable', 'string'], // 'text' en DB se mapea a 'string' en validación
             'gentilicio' => ['nullable', 'string', 'max:255'],
             'alcalde_nombre' => ['nullable', 'string', 'max:255'],
-            'alcalde_foto' => ['nullable', 'string', 'max:255'],
+            'alcalde_foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'circuscripcion' => ['nullable', 'string', 'max:255'],
             'comunidades' => ['nullable', 'string'], // Asumiendo que puede ser un texto largo
-            'aniversario' => ['nullable', 'date_format:m-d'], // 'string' en DB, validamos formato MM-DD
-            'fiestaPatronal' => ['nullable', 'date_format:m-d'], // 'string' en DB, validamos formato MM-DD
+            'aniversario' => ['nullable', 'string'], // 'string' en DB, validamos formato MM-DD
+            'fiestaPatronal' => ['nullable', 'string'], // 'string' en DB, validamos formato MM-DD
             'ferias' => ['nullable', 'string'], // 'text' en DB se mapea a 'string' en validación
             'facebook' => ['nullable', 'url', 'max:255'],
-            'user_id' => ['required', 'exists:users,id'], // Se asume que 'user_id' es una foreign key
         ];
     }
 
@@ -69,6 +72,9 @@ class StoreMunicipioRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'alcalde_foto.image' => 'El archivo debe ser una imagen.',
+            'alcalde_foto.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg, gif, svg.',
+            'alcalde_foto.max' => 'La imagen no debe exceder los 2MB de tamaño.',
             'nombre.required' => 'El nombre del municipio es obligatorio.',
             'nombre.unique' => 'Ya existe un municipio con este nombre.',
             'nombre.max' => 'El nombre no puede exceder los :max caracteres.',
@@ -83,8 +89,6 @@ class StoreMunicipioRequest extends FormRequest
             'superficie.min' => 'La superficie no puede ser negativa.',
             'aniversario.date_format' => 'El formato del aniversario debe ser MM-DD (ej. 10-11).',
             'fiestaPatronal.date_format' => 'El formato de la fiesta patronal debe ser MM-DD (ej. 08-15).',
-            'user_id.required' => 'El ID del usuario creador es obligatorio.',
-            'user_id.exists' => 'El usuario especificado no existe.',
         ];
     }
 
