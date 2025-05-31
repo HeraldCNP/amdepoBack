@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CircularController;
 use App\Http\Controllers\admin\DocumentoController;
 use App\Http\Controllers\admin\MunicipioController;
+use App\Http\Controllers\Admin\ProyectoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -94,7 +95,22 @@ Route::group([
 
     // Luego las rutas con parámetros de modelo comodín {municipio}
     Route::get('/circulares', [CircularController::class, 'index'])->name('circulares.index');
-    Route::patch('/circulares/{id}', [CircularController::class, 'update'])->name('circulares.update');
+    // Route::patch('/circulares/{id}', [CircularController::class, 'update'])->name('circulares.update');
     Route::get('/circulares/{id}', [CircularController::class, 'show'])->name('circulares.show');
     Route::delete('/circulares/{id}', [CircularController::class, 'eliminar'])->name('circulares.destroy');
+});
+
+Route::group([
+    'middleware' => ['api', 'auth:api'],
+    'prefix' => 'admin'
+], function ($router) {
+    // Primero las rutas con slugs/parámetros fijos o "más específicos"
+    // Route::get('/circulares/search', [ProyectoController::class, 'searchUsers']);
+    Route::post('/proyectos/register', [ProyectoController::class, 'store'])->name('proyectos.register');
+
+    // Luego las rutas con parámetros de modelo comodín {municipio}
+    Route::get('/proyectos', [ProyectoController::class, 'index'])->name('proyectos.index');
+    // Route::patch('/proyectos/{id}', [ProyectoController::class, 'update'])->name('proyectos.update');
+    Route::get('/proyectos/{id}', [ProyectoController::class, 'show'])->name('proyectos.show');
+    Route::delete('/proyectos/{id}', [ProyectoController::class, 'eliminar'])->name('proyectos.destroy');
 });

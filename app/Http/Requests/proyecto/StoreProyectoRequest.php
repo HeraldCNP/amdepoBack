@@ -1,19 +1,26 @@
 <?php
 
-namespace App\Http\Requests\circular;
+namespace App\Http\Requests\proyecto;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 
-class StoreCircularRequest extends FormRequest
+class StoreProyectoRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
     public function authorize(): bool
     {
-        // Asegúrate de que el usuario esté autenticado para crear una circular
-        // return Auth::check();
-        return true;
+        return Auth::id();
     }
 
     /**
@@ -24,9 +31,8 @@ class StoreCircularRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'titulo' => 'required|string|max:255|unique:circulars,titulo',
-            'imagenCircular' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // Máximo 5MB
-            // user_id no se valida aquí, se asigna automáticamente en el controlador
+            'titulo' => 'required|string|max:255|unique:proyectos,titulo',
+            'archivoPdf' => 'required|file|mimes:pdf|max:10240', // Máximo 10MB (10240 KB)
         ];
     }
 
@@ -38,14 +44,14 @@ class StoreCircularRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'titulo.required' => 'El título de la circular es obligatorio.',
+            'titulo.required' => 'El título del proyecto es obligatorio.',
+            'titulo.unique' => 'Ya existe otro proyecto con este título.',
             'titulo.string' => 'El título debe ser una cadena de texto.',
-            'titulo.unique' => 'Ya existe otra circular con este título.',
             'titulo.max' => 'El título no debe exceder los :max caracteres.',
-            'imagenCircular.required' => 'La imagen de la circular es obligatoria.',
-            'imagenCircular.image' => 'El archivo debe ser una imagen.',
-            'imagenCircular.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg, gif.',
-            'imagenCircular.max' => 'La imagen no debe ser mayor de 5MB.',
+            'archivoPdf.required' => 'El archivo PDF del proyecto es obligatorio.',
+            'archivoPdf.file' => 'El campo debe ser un archivo.',
+            'archivoPdf.mimes' => 'El archivo debe ser de tipo PDF.',
+            'archivoPdf.max' => 'El archivo no debe ser mayor de 10MB.',
         ];
     }
 
