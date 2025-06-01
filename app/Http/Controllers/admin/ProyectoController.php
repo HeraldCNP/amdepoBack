@@ -92,28 +92,23 @@ class ProyectoController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Proyecto $proyecto): JsonResponse
+    public function eliminar($id): JsonResponse
     {
         try {
-            // Eliminar el archivo PDF asociado si existe
-            if ($proyecto->archivoPdf) {
-                if (Storage::disk('public')->exists($proyecto->archivoPdf)) {
-                    Storage::disk('public')->delete($proyecto->archivoPdf);
-                }
+            $proyecto = Proyecto::findOrFail($id);
+            // dd($circular->imagenCircular);
+
+            if (Storage::disk('public')->exists($proyecto->archivoPdf)) {
+                Storage::disk('public')->delete($proyecto->archivoPdf);
             }
 
             $proyecto->delete();
 
-            return response()->json([
-                'message' => 'Proyecto eliminado exitosamente.',
-                'data' => null
-            ], 200);
-        } catch (Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error al eliminar proyecto: ' . $e->getMessage(), ['exception' => $e, 'proyecto_id' => $proyecto->id]);
-            return response()->json([
-                'message' => 'Ocurrió un error al intentar eliminar el proyecto.',
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(null, 204);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Documento no encontrado.'], 404);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Error al eliminar el documento.', 'message' => $e->getMessage()], 500);
         }
     }
 }

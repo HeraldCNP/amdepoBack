@@ -123,31 +123,6 @@ class CircularController extends Controller
         }
     }
 
-    public function destroy(Circular $circular): JsonResponse
-    {
-        dd($circular->imagenCircular);
-        try {
-            // Eliminar la imagen asociada si existe
-            if ($circular->imagenCircular) {
-                if (Storage::disk('public')->exists($circular->imagenCircular)) {
-                    Storage::disk('public')->delete($circular->imagenCircular);
-                }
-            }
-
-            $circular->delete();
-
-            return response()->json([
-                'message' => 'Circular eliminada exitosamente.',
-                'data' => null
-            ], 200);
-        } catch (Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error al eliminar circular: ' . $e->getMessage(), ['exception' => $e, 'circular_id' => $circular->id]);
-            return response()->json([
-                'message' => 'Ocurrió un error al intentar eliminar la circular.',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
 
     public function eliminar($id): JsonResponse
     {
