@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\CircularController;
+use App\Http\Controllers\Admin\ConvenioController;
 use App\Http\Controllers\admin\DocumentoController;
 use App\Http\Controllers\admin\MunicipioController;
 use App\Http\Controllers\Admin\ProyectoController;
+use App\Http\Controllers\Admin\PublicacionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -68,6 +70,7 @@ Route::group([
 
     // Luego las rutas con parámetros de modelo comodín {municipio}
     Route::get('/municipios', [MunicipioController::class, 'index'])->name('municipios.index');
+    Route::get('/municipios/list', [MunicipioController::class, 'list'])->name('municipios.list');
     // Route::patch('/municipios/{municipio}', [MunicipioController::class, 'update'])->name('municipios.update');
     Route::patch('municipios/{municipio}', [MunicipioController::class, 'update'])->middleware('force.form.data'); // <-- ¡Aquí aplicamos el middleware!
     Route::get('/municipios/{municipio}', [MunicipioController::class, 'show'])->name('municipios.show');
@@ -107,10 +110,37 @@ Route::group([
     // Primero las rutas con slugs/parámetros fijos o "más específicos"
     // Route::get('/circulares/search', [ProyectoController::class, 'searchUsers']);
     Route::post('/proyectos/register', [ProyectoController::class, 'store'])->name('proyectos.register');
-
     // Luego las rutas con parámetros de modelo comodín {municipio}
     Route::get('/proyectos', [ProyectoController::class, 'index'])->name('proyectos.index');
     // Route::patch('/proyectos/{id}', [ProyectoController::class, 'update'])->name('proyectos.update');
     Route::get('/proyectos/{id}', [ProyectoController::class, 'show'])->name('proyectos.show');
     Route::delete('/proyectos/{id}', [ProyectoController::class, 'eliminar'])->name('proyectos.destroy');
+});
+
+Route::group([
+    'middleware' => ['api', 'auth:api'],
+    'prefix' => 'admin'
+], function ($router) {
+    // Primero las rutas con slugs/parámetros fijos o "más específicos"
+    // Route::get('/circulares/search', [ProyectoController::class, 'searchUsers']);
+    Route::post('/publicaciones/register', [PublicacionController::class, 'store'])->name('proyectos.register');
+    // Luego las rutas con parámetros de modelo comodín {municipio}
+    Route::get('/publicaciones', [PublicacionController::class, 'index'])->name('publicaciones.index');
+    // Route::patch('/publicaciones/{id}', [PublicacionController::class, 'update'])->name('publicaciones.update');
+    Route::get('/publicaciones/{id}', [PublicacionController::class, 'show'])->name('publicaciones.show');
+    Route::delete('/publicaciones/{id}', [PublicacionController::class, 'eliminar'])->name('publicaciones.destroy');
+});
+
+Route::group([
+    'middleware' => ['api', 'auth:api'],
+    'prefix' => 'admin'
+], function ($router) {
+    // Primero las rutas con slugs/parámetros fijos o "más específicos"
+    // Route::get('/circulares/search', [ProyectoController::class, 'searchUsers']);
+    Route::post('/convenios/register', [ConvenioController::class, 'store'])->name('convenios.register');
+    // Luego las rutas con parámetros de modelo comodín {municipio}
+    Route::get('/convenios', [ConvenioController::class, 'index'])->name('convenios.index');
+    // Route::patch('/convenios/{id}', [ConvenioController::class, 'update'])->name('convenios.update');
+    Route::get('/convenios/{id}', [ConvenioController::class, 'show'])->name('convenios.show');
+    Route::delete('/convenios/{id}', [ConvenioController::class, 'eliminar'])->name('convenios.destroy');
 });

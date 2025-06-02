@@ -40,6 +40,28 @@ class MunicipioController extends Controller
         }
     }
 
+    public function list(): JsonResponse
+    {
+
+        try {
+            // $municipios = Municipio::all(); // O Municipio::paginate(15);
+            $municipios = Municipio::select('id', 'nombre', 'slug')->get();
+
+            return response()->json([
+                'message' => 'Municipios recuperados exitosamente.',
+                'data' => $municipios
+            ], 200);
+        } catch (Exception $e) {
+            // Log the exception for debugging
+            Log::error('Error al recuperar municipios: ' . $e->getMessage());
+
+            return response()->json([
+                'message' => 'Ocurrió un error al intentar recuperar los municipios.',
+                'error' => $e->getMessage() // Solo para desarrollo, en producción evita exponer detalles
+            ], 500); // 500 Internal Server Error
+        }
+    }
+
 
     public function store(StoreMunicipioRequest $request): JsonResponse
     {
