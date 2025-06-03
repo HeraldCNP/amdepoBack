@@ -31,14 +31,29 @@ class UserSeeder extends Seeder
             'address' => 'h vasquez 186',
         ]);
 
+        $user = User::create([
+            'name' => 'Cinthia',
+            'email' => 'Potosiamdepo01@gmail.com',
+            'password' => Hash::make('Amdepo2024Bolivi@'),
+        ]);
+
+        $user->profile()->create([
+            'ci' => '8631065',
+            'lastName' => 'Arenas Vela',
+            'phone' => '63689078',
+            'address' => '',
+        ]);
+
+
+
         // Crear 49 usuarios adicionales
-        User::factory(49)->create()->each(function ($user) use ($faker) { // Pasa $faker al closure
-            $user->profile()->create([
-                'ci' => $faker->numerify('########'),
-                'lastName' => $faker->lastName,
-                'phone' => $faker->numerify('7########'),
-                'address' => $faker->address,
-            ]);
-        });
+        // User::factory(49)->create()->each(function ($user) use ($faker) { // Pasa $faker al closure
+        //     $user->profile()->create([
+        //         'ci' => $faker->numerify('########'),
+        //         'lastName' => $faker->lastName,
+        //         'phone' => $faker->numerify('7########'),
+        //         'address' => $faker->address,
+        //     ]);
+        // });
     }
 }

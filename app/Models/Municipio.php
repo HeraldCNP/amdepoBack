@@ -30,6 +30,7 @@ class Municipio extends Model
         'historia',
         'latitud',
         'longitud',
+        'mapa_imagen',
         'nombre',
         'poblacion',
         'provincia',

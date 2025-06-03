@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('sitio_web')->nullable();
             $table->decimal('latitud', 10, 8)->nullable();
             $table->decimal('longitud', 10, 8)->nullable();
+            $table->string('mapa_imagen')->nullable();
             $table->integer('poblacion')->nullable();
             $table->decimal('superficie', 10, 2)->nullable();
             $table->text('historia')->nullable();

@@ -29,10 +29,6 @@ class UpdateMunicipioRequest extends FormRequest
 
         $municipio = $this->route('municipio');
         $municipioId = $municipio ? $municipio->id : null;
-
-
-
-
         return [
             'nombre' => ['required', 'string', 'max:255', Rule::unique('municipios')->ignore($municipioId)],
             'descripcion' => ['nullable', 'string'],
@@ -43,6 +39,7 @@ class UpdateMunicipioRequest extends FormRequest
             'sitio_web' => ['nullable', 'url', 'max:255'],
             'latitud' => ['nullable', 'numeric', 'between:-90,90'],
             'longitud' => ['nullable', 'numeric', 'between:-180,180'],
+            'mapa_imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // (max 5MB)
             'poblacion' => ['nullable', 'integer', 'min:0'],
             'superficie' => ['nullable', 'numeric', 'min:0'],
             'historia' => ['nullable', 'string'],
@@ -84,6 +81,9 @@ class UpdateMunicipioRequest extends FormRequest
             'facebook.url' => 'El formato de la URL de Facebook no es válido.',
             'latitud.between' => 'La latitud debe estar entre -90 y 90.',
             'longitud.between' => 'La longitud debe estar entre -180 y 180.',
+            'mapa_imagen.image' => 'El archivo del mapa debe ser una imagen.',
+            'mapa_imagen.mimes' => 'El archivo del mapa debe ser de tipo: jpeg, png, jpg, gif.',
+            'mapa_imagen.max' => 'El archivo del mapa no debe ser mayor de 5MB.',
             'poblacion.integer' => 'La población debe ser un número entero.',
             'poblacion.min' => 'La población no puede ser negativa.',
             'superficie.numeric' => 'La superficie debe ser un valor numérico.',

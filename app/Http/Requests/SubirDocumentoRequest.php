@@ -22,7 +22,7 @@ class SubirDocumentoRequest extends FormRequest
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
             'gestion' => 'string',
-            'archivo' => 'required|file|mimes:pdf|max:2048', // Validar el archivo PDF
+            'archivo' => 'required|file|mimes:pdf|max:10048', // Validar el archivo PDF
         ];
     }
 
