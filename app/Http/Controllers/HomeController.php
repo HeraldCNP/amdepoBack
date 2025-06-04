@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Documento;
+use App\Models\Municipio;
 use App\Models\Publicacion;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -35,6 +39,22 @@ class HomeController extends Controller
             return response()->json($publicaciones);
         } catch (\Throwable $e) {
             return response()->json(['error' => 'Error al listar los publicaciones.', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getMunicipio(string $slug): JsonResponse
+    {
+        try {
+            $municipio = Municipio::where('slug', $slug)->firstOrFail();
+            return response()->json($municipio, 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Municipio no encontrado.'], 404);
+        } catch (Exception $e) {
+            Log::error('Error al obtener municipio por slug: ' . $e->getMessage(), ['exception' => $e, 'slug' => $slug]);
+            return response()->json([
+                'message' => 'Ocurrió un error al intentar obtener el municipio.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

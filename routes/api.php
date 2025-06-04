@@ -22,6 +22,7 @@ Route::group([
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::get('/documentos', [HomeController::class, 'allDocumentos']); // Listar los documentos de un municipio
     Route::get('/publicaciones', [HomeController::class, 'allPublicaciones']); // Listar los documentos de un municipio
+    Route::get('/municipios/{municipio}', [HomeController::class, 'getMunicipio']); // Obtener un municipio por slug
 });
 
 // Rutas protegidas (requieren autenticación JWT)
