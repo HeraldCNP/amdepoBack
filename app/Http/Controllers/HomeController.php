@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Circular;
 use App\Models\Documento;
 use App\Models\Municipio;
 use App\Models\Publicacion;
@@ -28,19 +29,21 @@ class HomeController extends Controller
         }
     }
 
-    public function allPublicaciones(): JsonResponse // O podrías usar un método llamado listarPublicos
+    public function getPublicaciones(Request $request): JsonResponse // O podrías usar un método llamado listarPublicos
     {
         try {
-            $publicaciones = Publicacion::orderBy('created_at', 'desc') // Ordena por fecha de creación, las más nuevas primero
-                ->take(3) // Limita los resultados a 3
-                ->get(); // Ejecuta la consulta y obtiene los resultados
+            $perPage = $request->input('per_page', 9);
 
+            $publicaciones = Publicacion::orderBy('created_at', 'DESC') // <-- Agrega esta línea
+                ->paginate($perPage);
 
             return response()->json($publicaciones);
         } catch (\Throwable $e) {
             return response()->json(['error' => 'Error al listar los publicaciones.', 'message' => $e->getMessage()], 500);
         }
     }
+
+
 
     public function getMunicipio(string $slug): JsonResponse
     {
@@ -56,5 +59,21 @@ class HomeController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+
+    public function getCirculares(Request $request)
+    {
+
+        try {
+        $perPage = $request->input('per_page', 9); // Por defecto 9 ítems por página
+        $circulares = Circular::orderBy('created_at', 'DESC') // Las más nuevas primero
+            ->paginate($perPage);
+
+        return response()->json($circulares);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Error al listar las circulares.', 'message' => $e->getMessage()], 500);
+        }
+
     }
 }

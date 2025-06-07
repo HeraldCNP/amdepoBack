@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\Admin\CircularController;
-use App\Http\Controllers\Admin\ConvenioController;
+use App\Http\Controllers\admin\CircularController;
+use App\Http\Controllers\admin\ConvenioController;
 use App\Http\Controllers\admin\DocumentoController;
 use App\Http\Controllers\admin\MunicipioController;
-use App\Http\Controllers\Admin\ProyectoController;
-use App\Http\Controllers\Admin\PublicacionController;
+use App\Http\Controllers\admin\ProyectoController;
+use App\Http\Controllers\admin\PublicacionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -20,9 +20,11 @@ Route::group([
     Route::get('/prueba', [AuthController::class, 'prueba'])->name('prueba');
     // Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
-    Route::get('/documentos', [HomeController::class, 'allDocumentos']); // Listar los documentos de un municipio
-    Route::get('/publicaciones', [HomeController::class, 'allPublicaciones']); // Listar los documentos de un municipio
     Route::get('/municipios/{municipio}', [HomeController::class, 'getMunicipio']); // Obtener un municipio por slug
+    Route::get('/documentos', [HomeController::class, 'allDocumentos']);
+    Route::get('/publicaciones', [HomeController::class, 'getPublicaciones']);
+    Route::get('/circulares', [HomeController::class, 'getCirculares']);
+    // Route::get('/allPublicaciones', [HomeController::class, 'allPublicaciones']);
 });
 
 // Rutas protegidas (requieren autenticación JWT)

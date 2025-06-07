@@ -36,7 +36,7 @@ class UpdateMunicipioRequest extends FormRequest
             'direccion' => ['nullable', 'string', 'max:255'],
             'telefono' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
-            'sitio_web' => ['nullable', 'url', 'max:255'],
+            'sitio_web' => ['nullable', 'max:255'],
             'latitud' => ['nullable', 'numeric', 'between:-90,90'],
             'longitud' => ['nullable', 'numeric', 'between:-180,180'],
             'mapa_imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // (max 5MB)
@@ -77,7 +77,7 @@ class UpdateMunicipioRequest extends FormRequest
             'nombre.unique' => 'Ya existe otro municipio con este nombre.',
             'nombre.max' => 'El nombre no puede exceder los :max caracteres.',
             'email.email' => 'El formato del email no es válido.',
-            'sitio_web.url' => 'El formato del sitio web no es válido.',
+            // 'sitio_web.url' => 'El formato del sitio web no es válido.',
             'facebook.url' => 'El formato de la URL de Facebook no es válido.',
             'latitud.between' => 'La latitud debe estar entre -90 y 90.',
             'longitud.between' => 'La longitud debe estar entre -180 y 180.',
