@@ -24,6 +24,8 @@ Route::group([
     Route::get('/documentos', [HomeController::class, 'allDocumentos']);
     Route::get('/publicaciones', [HomeController::class, 'getPublicaciones']);
     Route::get('/circulares', [HomeController::class, 'getCirculares']);
+    Route::get('/convenios', [HomeController::class, 'getConvenios']);
+    Route::get('/proyectos', [HomeController::class, 'getProyectos']);
     // Route::get('/allPublicaciones', [HomeController::class, 'allPublicaciones']);
 });
 

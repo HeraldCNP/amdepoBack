@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Circular;
+use App\Models\Convenio;
 use App\Models\Documento;
 use App\Models\Municipio;
+use App\Models\Proyecto;
 use App\Models\Publicacion;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -66,14 +68,43 @@ class HomeController extends Controller
     {
 
         try {
-        $perPage = $request->input('per_page', 9); // Por defecto 9 ítems por página
-        $circulares = Circular::orderBy('created_at', 'DESC') // Las más nuevas primero
-            ->paginate($perPage);
+            $perPage = $request->input('per_page', 9); // Por defecto 9 ítems por página
+            $circulares = Circular::orderBy('created_at', 'DESC') // Las más nuevas primero
+                ->paginate($perPage);
 
-        return response()->json($circulares);
+            return response()->json($circulares);
         } catch (\Throwable $e) {
             return response()->json(['error' => 'Error al listar las circulares.', 'message' => $e->getMessage()], 500);
         }
-
     }
+
+
+    public function getConvenios(Request $request)
+    {
+        try {
+            $perPage = $request->input('per_page', 9); // Por defecto 9 ítems por página
+            $convenios = Convenio::orderBy('created_at', 'DESC') // Las más nuevas primero
+                ->paginate($perPage);
+
+            return response()->json($convenios);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Error al listar los convenios.', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getProyectos(Request $request)
+    {
+        try {
+            $perPage = $request->input('per_page', 9); // Por defecto 9 ítems por página
+            $proyectos = Proyecto::orderBy('created_at', 'DESC') // Las más nuevas primero
+                ->paginate($perPage);
+
+            return response()->json($proyectos);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Error al listar los proyectos.', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+
+
 }
