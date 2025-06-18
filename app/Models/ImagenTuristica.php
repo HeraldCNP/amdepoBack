@@ -9,8 +9,12 @@ class ImagenTuristica extends Model
 {
     use HasFactory;
 
+    protected $table = 'imagenes_turisticas';
+
     protected $fillable = [
-        'municipio_id', 'ruta_imagen'
+        'descripcion', // Nombre de la columna en la DB
+        'municipio_id',
+        'ruta_imagen', // Nombre de la columna en la DB
     ];
 
     public function municipio()

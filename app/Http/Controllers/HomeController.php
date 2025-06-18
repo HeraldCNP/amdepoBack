@@ -50,7 +50,7 @@ class HomeController extends Controller
     public function getMunicipio(string $slug): JsonResponse
     {
         try {
-            $municipio = Municipio::where('slug', $slug)->firstOrFail();
+            $municipio = Municipio::where('slug', $slug)->with('imagenesTuristicas')->firstOrFail();
             return response()->json($municipio, 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Municipio no encontrado.'], 404);
@@ -104,7 +104,4 @@ class HomeController extends Controller
             return response()->json(['error' => 'Error al listar los proyectos.', 'message' => $e->getMessage()], 500);
         }
     }
-
-
-
 }
