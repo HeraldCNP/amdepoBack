@@ -22,7 +22,9 @@ class MunicipioController extends Controller
     {
 
         try {
-            $municipios = Municipio::all(); // O Municipio::paginate(15);
+            // $municipios = Municipio::all();
+            $municipios = Municipio::with(['user', 'imagenesTuristicas'])->get();
+                                //  ->orderBy('created_at', 'desc')
             // $municipios = Municipio::select('id', 'nombre', 'slug')->get();
 
             return response()->json([

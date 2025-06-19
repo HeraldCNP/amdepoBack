@@ -3,7 +3,7 @@
 use App\Http\Controllers\admin\CircularController;
 use App\Http\Controllers\admin\ConvenioController;
 use App\Http\Controllers\admin\DocumentoController;
-use App\Http\Controllers\Admin\ImagenTuristicaController;
+use App\Http\Controllers\admin\ImagenTuristicaController;
 use App\Http\Controllers\admin\MunicipioController;
 use App\Http\Controllers\admin\ProyectoController;
 use App\Http\Controllers\admin\PublicacionController;
@@ -159,5 +159,5 @@ Route::group([
     Route::post('/imagenes-turisticas/register', [ImagenTuristicaController::class, 'store'])->name('imagenes-turisticas.register');
     Route::get('/imagenes-turisticas', [ImagenTuristicaController::class, 'index'])->name('imagenes-turisticas.index');
     Route::get('/imagenes-turisticas/{id}', [ImagenTuristicaController::class, 'show'])->name('imagenes-turisticas.show');
-    Route::delete('/imagenes-turisticas/{id}', [ImagenTuristicaController::class, 'eliminar'])->name('imagenes-turisticas.destroy');
+    Route::delete('/imagenes-turisticas/{id}', [ImagenTuristicaController::class, 'destroy'])->name('imagenes-turisticas.destroy');
 });

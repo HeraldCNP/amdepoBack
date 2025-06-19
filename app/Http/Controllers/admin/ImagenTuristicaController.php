@@ -85,9 +85,11 @@ class ImagenTuristicaController extends Controller
     }
 
 
-    public function destroy(ImagenTuristica $imagenTuristica): JsonResponse
+    public function destroy($id): JsonResponse
     {
         try {
+            $imagenTuristica = ImagenTuristica::findOrFail($id);
+
             // Eliminar la imagen asociada si existe
             if ($imagenTuristica->ruta_imagen) {
                 if (Storage::disk('public')->exists($imagenTuristica->ruta_imagen)) {
