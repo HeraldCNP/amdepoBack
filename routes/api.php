@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\admin\CategoriaController;
 use App\Http\Controllers\admin\CircularController;
 use App\Http\Controllers\admin\ConvenioController;
 use App\Http\Controllers\admin\DocumentoController;
+use App\Http\Controllers\Admin\ImagenNoticiaController;
 use App\Http\Controllers\admin\ImagenTuristicaController;
 use App\Http\Controllers\admin\MunicipioController;
+use App\Http\Controllers\admin\NoticiaController;
 use App\Http\Controllers\admin\ProyectoController;
 use App\Http\Controllers\admin\PublicacionController;
 use Illuminate\Support\Facades\Route;
@@ -160,4 +163,40 @@ Route::group([
     Route::get('/imagenes-turisticas', [ImagenTuristicaController::class, 'index'])->name('imagenes-turisticas.index');
     Route::get('/imagenes-turisticas/{id}', [ImagenTuristicaController::class, 'show'])->name('imagenes-turisticas.show');
     Route::delete('/imagenes-turisticas/{id}', [ImagenTuristicaController::class, 'destroy'])->name('imagenes-turisticas.destroy');
+});
+
+Route::group([
+    'middleware' => ['api', 'auth:api'],
+    'prefix' => 'admin'
+], function ($router) {
+    Route::post('/categorias/register', [CategoriaController::class, 'store'])->name('categorias.register');
+    Route::get('/categorias', [CategoriaController::class, 'index'])->name('categorias.index');
+    Route::get('/categorias/{categoria}', [CategoriaController::class, 'show'])->name('categorias.show');
+    Route::delete('/categorias/{categoria}', [CategoriaController::class, 'destroy'])->name('categorias.destroy');
+});
+
+Route::group([
+    'middleware' => ['api', 'auth:api'],
+    'prefix' => 'admin'
+], function ($router) {
+    Route::post('/noticias/register', [NoticiaController::class, 'store'])->name('noticias.register');
+    Route::get('/noticias', [NoticiaController::class, 'index'])->name('noticias.index');
+    Route::get('/noticias/{noticia}', [NoticiaController::class, 'show'])->name('noticias.show');
+    Route::patch('/noticias/{noticia}', [NoticiaController::class, 'update'])->name('noticias.update');
+    Route::delete('/noticias/{noticia}', [NoticiaController::class, 'destroy'])->name('noticias.destroy');
+});
+
+Route::group([
+    'middleware' => ['api', 'auth:api'],
+    'prefix' => 'admin'
+], function ($router) {
+    Route::post('/noticias/imagenes/register', [ImagenNoticiaController::class, 'store'])->name('noticias.imagenes.register');
+    // Para listar todas las imágenes de noticias (o filtrar por noticia_id)
+    Route::get('/noticias/imagenes', [ImagenNoticiaController::class, 'index'])->name('noticias.imagenes.index');
+    // Para mostrar una imagen de noticia específica
+    Route::get('/noticias/imagenes/{imagenNoticia}', [ImagenNoticiaController::class, 'show'])->name('noticias.imagenes.show');
+    // Para actualizar una imagen de noticia específica (si se cambia el archivo o la descripción)
+    // Route::patch('/noticias/imagenes/{imagenNoticia}', [ImagenNoticiaController::class, 'update'])->middleware('force.form.data')->name('noticias.imagenes.update');
+    // Para eliminar una imagen de noticia específica
+    Route::delete('/noticias/imagenes/{imagenNoticia}', [ImagenNoticiaController::class, 'destroy'])->name('noticias.imagenes.destroy');
 });
