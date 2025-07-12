@@ -89,12 +89,12 @@ class ImagenTuristicaController extends Controller
     {
         try {
             $imagenTuristica = ImagenTuristica::findOrFail($id);
-
-            // Eliminar la imagen asociada si existe
-            if ($imagenTuristica->ruta_imagen) {
-                if (Storage::disk('public')->exists($imagenTuristica->ruta_imagen)) {
-                    Storage::disk('public')->delete($imagenTuristica->ruta_imagen);
-                }
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Imagen turística no encontrada.'], 404);
+        }
+        try {
+            if ($imagenTuristica->ruta_imagen && Storage::disk('public')->exists($imagenTuristica->ruta_imagen)) {
+                Storage::disk('public')->delete($imagenTuristica->ruta_imagen);
             }
 
             $imagenTuristica->delete();

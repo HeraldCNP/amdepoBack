@@ -4,7 +4,7 @@ use App\Http\Controllers\admin\CategoriaController;
 use App\Http\Controllers\admin\CircularController;
 use App\Http\Controllers\admin\ConvenioController;
 use App\Http\Controllers\admin\DocumentoController;
-use App\Http\Controllers\Admin\ImagenNoticiaController;
+use App\Http\Controllers\admin\ImagenNoticiaController;
 use App\Http\Controllers\admin\ImagenTuristicaController;
 use App\Http\Controllers\admin\MunicipioController;
 use App\Http\Controllers\admin\NoticiaController;
@@ -26,7 +26,7 @@ Route::group([
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::get('/municipios/{municipio}', [HomeController::class, 'getMunicipio']); // Obtener un municipio por slug
     Route::get('/documentos', [HomeController::class, 'allDocumentos']);
-    Route::get('/publicaciones', [HomeController::class, 'getPublicaciones']);
+    Route::get('/noticias', [HomeController::class, 'getNoticias']);
     Route::get('/circulares', [HomeController::class, 'getCirculares']);
     Route::get('/convenios', [HomeController::class, 'getConvenios']);
     Route::get('/proyectos', [HomeController::class, 'getProyectos']);

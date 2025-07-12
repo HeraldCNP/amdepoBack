@@ -6,6 +6,7 @@ use App\Models\Circular;
 use App\Models\Convenio;
 use App\Models\Documento;
 use App\Models\Municipio;
+use App\Models\Noticia;
 use App\Models\Proyecto;
 use App\Models\Publicacion;
 use Exception;
@@ -31,17 +32,40 @@ class HomeController extends Controller
         }
     }
 
-    public function getPublicaciones(Request $request): JsonResponse // O podrías usar un método llamado listarPublicos
+    public function getNoticias(Request $request): JsonResponse // O podrías usar un método llamado listarPublicos
     {
         try {
-            $perPage = $request->input('per_page', 9);
+            $perPage = request()->query('per_page', 9);
+            $searchTerm = request()->query('search');
+            $limit = request()->query('limit'); // <-- Nuevo: Obtiene el parámetro 'limit'
 
-            $publicaciones = Publicacion::orderBy('created_at', 'DESC') // <-- Agrega esta línea
-                ->paginate($perPage);
+            $query = Noticia::with(['user', 'categoria', 'imagenesNoticias'])
+                ->orderBy('created_at', 'desc'); // Ya tienes el orden descendente, lo cual es bueno para "últimas"
 
-            return response()->json($publicaciones);
+            // Aplica el filtro de búsqueda si se proporciona un término
+            if ($searchTerm) {
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('titulo', 'like', '%' . $searchTerm . '%')
+                        ->orWhere('texto', 'like', '%' . $searchTerm . '%')
+                        ->orWhereHas('categoria', function ($q2) use ($searchTerm) {
+                            $q2->where('nombre', 'like', '%' . $searchTerm . '%');
+                        })
+                        ->orWhereHas('user', function ($q3) use ($searchTerm) {
+                            $q3->where('name', 'like', '%' . $searchTerm . '%');
+                        });
+                });
+            }
+
+            // <-- Nuevo: Maneja el parámetro 'limit'
+            if ($limit) {
+                $noticias = $query->limit($limit)->get(); // Si hay límite, usa get() en lugar de paginate()
+            } else {
+                $noticias = $query->paginate($perPage); // Si no hay límite, usa paginación normal
+            }
+
+            return response()->json($noticias);
         } catch (\Throwable $e) {
-            return response()->json(['error' => 'Error al listar los publicaciones.', 'message' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al listar las noticias.', 'message' => $e->getMessage()], 500);
         }
     }
 
