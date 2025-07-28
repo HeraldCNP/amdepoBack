@@ -25,7 +25,7 @@ class StoreCircularRequest extends FormRequest
     {
         return [
             'titulo' => 'required|string|max:255|unique:circulars,titulo',
-            'imagenCircular' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // Máximo 5MB
+            'imagenCircular' => 'required|image|mimes:jpeg,png,jpg,gif|max:10120', // Máximo 5MB
             // user_id no se valida aquí, se asigna automáticamente en el controlador
         ];
     }

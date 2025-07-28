@@ -12,6 +12,8 @@ use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log; // Para logs de error
 use Illuminate\Support\Str; // Para generar slugs para nombres de archivos
+use Intervention\Image\ImageManager; // Importa ImageManager
+use Intervention\Image\Drivers\Gd\Driver; // Importa el Driver (Gd es común)
 
 class ImagenNoticiaController extends Controller
 {
@@ -50,27 +52,31 @@ class ImagenNoticiaController extends Controller
         try {
             $validatedData = $request->validated();
             $noticiaId = $validatedData['noticia_id'];
-            // CAMBIO CLAVE: Obtener una única descripción para todas las imágenes
-            $descripcionGeneral = $validatedData['descripcion'] ?? null;
+            $descripcionGeneral = $validatedData['descripcion'] ?? null; // Obtener una única descripción para todas las imágenes
 
             $uploadedImages = [];
+            $manager = new ImageManager(new Driver()); // Instancia el ImageManager para el store
 
-            if ($request->hasFile('imagen_files')) {
+            if ($request->hasFile('imagen_files')) { // 'imagen_files' es el nombre del campo del array de archivos
                 foreach ($request->file('imagen_files') as $index => $file) {
-                    // Usar la descripción general para todas las imágenes
                     $descripcionParaEstaImagen = $descripcionGeneral;
 
                     // Generar un slug basado en la descripción general y un índice para asegurar unicidad en el nombre del archivo
                     $descripcionSlug = Str::slug($descripcionGeneral ?? 'imagen') . '-' . ($index + 1);
-                    $extension = $file->getClientOriginalExtension();
-                    $imageName = "noticia-{$noticiaId}-{$descripcionSlug}-" . time() . '.' . $extension;
+                    // Siempre guardaremos como JPG
+                    $imageName = "noticia-{$noticiaId}-{$descripcionSlug}-" . time() . '.jpg';
 
-                    $imagePath = $file->storeAs('noticias/imagenes', $imageName, 'public');
+                    $img = $manager->read($file->getRealPath()); // Lee el archivo
+                    $img->scale(width: 1280); // Escala a un ancho máximo de 1280px
+                    $encodedImage = $img->toJpeg(75); // Convierte y comprime a JPEG
+
+                    // Guarda la imagen procesada en 'public/noticias/imagenes' directory
+                    Storage::disk('public')->put("noticias/imagenes/{$imageName}", $encodedImage);
 
                     $imagenNoticia = ImagenNoticia::create([
                         'noticia_id' => $noticiaId,
-                        'ruta_imagen' => $imagePath,
-                        'descripcion' => $descripcionParaEstaImagen, // Guardar la descripción general
+                        'ruta_imagen' => "noticias/imagenes/{$imageName}", // Guarda la ruta completa
+                        'descripcion' => $descripcionParaEstaImagen,
                     ]);
                     $uploadedImages[] = $imagenNoticia;
                 }
@@ -85,7 +91,7 @@ class ImagenNoticiaController extends Controller
             return response()->json([
                 'message' => 'Imágenes de noticia creadas exitosamente.',
                 'data' => $uploadedImages
-            ], 201);
+            ], 201); // 201 Created
         } catch (Exception $e) {
             Log::error('Error al crear imágenes de noticia: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json([
@@ -122,25 +128,37 @@ class ImagenNoticiaController extends Controller
         try {
             $validatedData = $request->validated();
 
-            // La lógica de actualización de una sola imagen permanece igual
+            $manager = new ImageManager(new Driver()); // Instancia el ImageManager para el update
+
+            // Handle image file replacement/deletion
+            // El campo de archivo en el request de update sigue siendo 'imagen_file' (singular)
             if ($request->hasFile('imagen_file')) {
+                // Delete old image if it exists
                 if ($imagenNoticia->ruta_imagen && Storage::disk('public')->exists($imagenNoticia->ruta_imagen)) {
                     Storage::disk('public')->delete($imagenNoticia->ruta_imagen);
                 }
 
+                // Store the new image
                 $noticiaId = $validatedData['noticia_id'];
                 $descripcionSlug = Str::slug($validatedData['descripcion'] ?? 'imagen');
-                $extension = $request->file('imagen_file')->getClientOriginalExtension();
-                $imageName = "noticia-{$noticiaId}-{$descripcionSlug}-" . time() . '.' . $extension;
+                // Siempre guardaremos como JPG
+                $imageName = "noticia-{$noticiaId}-{$descripcionSlug}-" . time() . '.jpg';
 
-                $imagePath = $request->file('imagen_file')->storeAs('noticias/imagenes', $imageName, 'public');
-                $validatedData['ruta_imagen'] = $imagePath;
+                $imageFile = $request->file('imagen_file');
+                $img = $manager->read($imageFile->getRealPath()); // Lee el archivo
+                $img->scale(width: 1280); // Escala a un ancho máximo de 1280px
+                $encodedImage = $img->toJpeg(75); // Convierte y comprime a JPEG
+
+                Storage::disk('public')->put("noticias/imagenes/{$imageName}", $encodedImage);
+                $validatedData['ruta_imagen'] = "noticias/imagenes/{$imageName}"; // Guarda la ruta completa
             } elseif (array_key_exists('imagen_file', $request->all()) && is_null($request->input('imagen_file'))) {
+                // If 'imagen_file' was sent as null, it means the client wants to delete the image
                 if ($imagenNoticia->ruta_imagen && Storage::disk('public')->exists($imagenNoticia->ruta_imagen)) {
                     Storage::disk('public')->delete($imagenNoticia->ruta_imagen);
                 }
                 $validatedData['ruta_imagen'] = null;
             } else {
+                // If no new file was uploaded and no deletion was requested, keep the existing path
                 $validatedData['ruta_imagen'] = $imagenNoticia->ruta_imagen;
             }
 

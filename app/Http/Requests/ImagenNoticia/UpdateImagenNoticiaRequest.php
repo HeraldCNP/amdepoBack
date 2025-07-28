@@ -27,7 +27,7 @@ class UpdateImagenNoticiaRequest extends FormRequest
     {
         return [
             'noticia_id' => 'required|exists:noticias,id', // El ID de la noticia debe seguir siendo válido
-            'imagen_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // La imagen es opcional al actualizar
+            'imagen_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10120', // La imagen es opcional al actualizar
             'descripcion' => 'nullable|string|max:255', // Descripción opcional
         ];
     }

@@ -28,7 +28,7 @@ class StoreImagenNoticiaRequest extends FormRequest
             'noticia_id' => 'required|exists:noticias,id',
             // CAMBIO CLAVE: 'imagen_files' ahora es un array de imágenes
             'imagen_files' => 'required|array|min:1', // Debe ser un array y contener al menos 1 archivo
-            'imagen_files.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // Cada elemento del array debe ser una imagen
+            'imagen_files.*' => 'image|mimes:jpeg,png,jpg,gif|max:10120', // Cada elemento del array debe ser una imagen
             'descripcion' => 'nullable|string|max:255', // Esta descripción se aplicará a todas las imágenes subidas en esta solicitud
         ];
     }

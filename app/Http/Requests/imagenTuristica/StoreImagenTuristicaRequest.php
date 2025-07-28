@@ -24,7 +24,7 @@ class StoreImagenTuristicaRequest extends FormRequest
         return [
             'descripcion' => 'required|string|max:255', // <-- ¡Cambiado aquí!
             'municipio_id' => 'required|exists:municipios,id',
-            'imagen_file' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'imagen_file' => 'required|image|mimes:jpeg,png,jpg,gif|max:10120',
         ];
     }
 

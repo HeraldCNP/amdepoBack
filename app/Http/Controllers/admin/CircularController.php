@@ -12,6 +12,8 @@ use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Intervention\Image\ImageManager; // <-- Importa ImageManager
+use Intervention\Image\Drivers\Gd\Driver; // <-- Importa el Driver que vas a usar (Gd es común)
 
 class CircularController extends Controller
 {
@@ -33,17 +35,27 @@ class CircularController extends Controller
     {
         try {
             $validatedData = $request->validated();
-
-            $validatedData['user_id'] = Auth::id(); // Asignar el ID del usuario autenticado
+            $validatedData['user_id'] = Auth::id();
 
             if ($request->hasFile('imagenCircular')) {
+                $imageFile = $request->file('imagenCircular');
                 $tituloSlug = \Illuminate\Support\Str::slug($validatedData['titulo'] ?? 'sin-titulo');
-                $extension = $request->file('imagenCircular')->getClientOriginalExtension();
-                $imageName = $tituloSlug . '-' . time() . '.' . $extension;
+                // La extensión original ya no importa tanto, siempre guardaremos como JPG
+                $imageName = $tituloSlug . '-' . time() . '.jpg'; // <-- Siempre .jpg
+                $directory = 'circulares';
 
-                $imagePath = $request->file('imagenCircular')->storeAs('circulares', $imageName, 'public');
+                $manager = new ImageManager(new Driver());
+                $img = $manager->read($imageFile->getRealPath());
 
-                $validatedData['imagenCircular'] = $imagePath;
+                // Redimensionar si es necesario, manteniendo el aspecto y sin agrandar
+                $img->scale(width: 1280);
+
+                // Convertir y comprimir a JPEG
+                $encodedImage = $img->toJpeg(90); // <-- Siempre a JPEG con calidad 75
+
+                Storage::disk('public')->put("{$directory}/{$imageName}", $encodedImage);
+
+                $validatedData['imagenCircular'] = "{$directory}/{$imageName}";
             }
 
             $circular = Circular::create($validatedData);
@@ -53,7 +65,7 @@ class CircularController extends Controller
                 'data' => $circular
             ], 201);
         } catch (Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error al crear circular: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error al crear circular: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json([
                 'message' => 'Ocurrió un error al intentar crear la circular.',
                 'error' => $e->getMessage()

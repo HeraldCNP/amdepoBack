@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Storage;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
+use Intervention\Image\ImageManager; // Importa ImageManager
+use Intervention\Image\Drivers\Gd\Driver; // Importa el Driver (Gd es común)
 
 class ImagenTuristicaController extends Controller
 {
@@ -39,15 +41,21 @@ class ImagenTuristicaController extends Controller
         try {
             $validatedData = $request->validated();
 
+            $manager = new ImageManager(new Driver()); // Instancia el ImageManager
+
             // Guardar la imagen
             if ($request->hasFile('imagen_file')) {
-                // Usamos la descripción para generar el nombre del archivo
-                $descripcionSlug = \Illuminate\Support\Str::slug($validatedData['descripcion'] ?? 'sin-descripcion'); // <-- ¡Cambiado aquí!
-                $extension = $request->file('imagen_file')->getClientOriginalExtension();
-                $imageName = $descripcionSlug . '-' . time() . '.' . $extension;
+                $imageFile = $request->file('imagen_file');
+                $descripcionSlug = Str::slug($validatedData['descripcion'] ?? 'sin-descripcion');
+                $imageName = $descripcionSlug . '-' . time() . '.jpg'; // <-- Siempre .jpg
+                $directory = 'imagenes_turisticas';
 
-                $imagePath = $request->file('imagen_file')->storeAs('imagenes_turisticas', $imageName, 'public');
-                $validatedData['ruta_imagen'] = $imagePath;
+                $img = $manager->read($imageFile->getRealPath()); // Lee el archivo
+                $img->scale(width: 1280); // Escala a un ancho máximo de 1280px
+                $encodedImage = $img->toJpeg(75); // Convierte y comprime a JPEG
+
+                Storage::disk('public')->put("{$directory}/{$imageName}", $encodedImage);
+                $validatedData['ruta_imagen'] = "{$directory}/{$imageName}"; // Guarda la ruta completa
             }
 
             $imagenTuristica = ImagenTuristica::create($validatedData);

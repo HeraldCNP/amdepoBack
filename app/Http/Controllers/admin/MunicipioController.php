@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Intervention\Image\ImageManager; // Importa ImageManager
+use Intervention\Image\Drivers\Gd\Driver; // Importa el Driver (Gd es común)
 
 class MunicipioController extends Controller
 {
@@ -24,7 +26,7 @@ class MunicipioController extends Controller
         try {
             // $municipios = Municipio::all();
             $municipios = Municipio::with(['user', 'imagenesTuristicas'])->get();
-                                //  ->orderBy('created_at', 'desc')
+            //  ->orderBy('created_at', 'desc')
             // $municipios = Municipio::select('id', 'nombre', 'slug')->get();
 
             return response()->json([
@@ -71,24 +73,44 @@ class MunicipioController extends Controller
             $validatedData = $request->validated();
             $validatedData['user_id'] = Auth::id();
 
-            // Lógica para la imagen del mapa
-            if ($request->hasFile('mapa_imagen')) { // El campo del formulario es 'mapa'
-                $nombreSlug = \Illuminate\Support\Str::slug($validatedData['nombre'] ?? 'sin-nombre');
-                $extension = $request->file('mapa_imagen')->getClientOriginalExtension();
-                $imageName = $nombreSlug . '-mapa-' . time() . '.' . $extension;
+            $manager = new ImageManager(new Driver()); // Instancia el ImageManager
 
-                $imagePath = $request->file('mapa_imagen')->storeAs('municipios/mapas', $imageName, 'public');
-                $validatedData['mapa_imagen'] = $imagePath; // Guardar la ruta en el campo de la DB
+            // Lógica para la imagen del mapa
+            if ($request->hasFile('mapa_imagen')) {
+                $imageFile = $request->file('mapa_imagen');
+                $nombreSlug = \Illuminate\Support\Str::slug($validatedData['nombre'] ?? 'sin-nombre');
+                $imageName = $nombreSlug . '-mapa-' . time() . '.jpg'; // <-- Siempre .jpg
+                $directory = 'municipios/mapas';
+
+                $img = $manager->read($imageFile->getRealPath());
+
+                // Redimensionar usando scale para mantener aspecto y ancho máximo
+                $img->scale(width: 1280);
+
+                // Convertir y comprimir a JPEG
+                $encodedImage = $img->toJpeg(75); // Calidad 75 para JPEG
+
+                Storage::disk('public')->put("{$directory}/{$imageName}", $encodedImage);
+                $validatedData['mapa_imagen'] = "{$directory}/{$imageName}";
             }
 
-            // Lógica existente para la foto del alcalde
+            // Lógica para la foto del alcalde
             if ($request->hasFile('alcalde_foto')) {
+                $imageFile = $request->file('alcalde_foto'); // Obtener el archivo de la solicitud
                 $nombreAlcaldeSlug = \Illuminate\Support\Str::slug($validatedData['alcalde_nombre'] ?? 'sin-alcalde');
-                $extensionAlcalde = $request->file('alcalde_foto')->getClientOriginalExtension();
-                $alcaldeImageName = $nombreAlcaldeSlug . '-foto-' . time() . '.' . $extensionAlcalde;
+                $alcaldeImageName = $nombreAlcaldeSlug . '-foto-' . time() . '.jpg'; // <-- Siempre .jpg
+                $directory = 'municipios/alcaldes';
 
-                $alcaldeImagePath = $request->file('alcalde_foto')->storeAs('municipios/alcaldes', $alcaldeImageName, 'public');
-                $validatedData['alcalde_foto'] = $alcaldeImagePath;
+                $img = $manager->read($imageFile->getRealPath());
+
+                // Redimensionar usando scale para mantener aspecto y ancho máximo
+                $img->scale(width: 1280);
+
+                // Convertir y comprimir a JPEG
+                $encodedImage = $img->toJpeg(75); // Calidad 75 para JPEG
+
+                Storage::disk('public')->put("{$directory}/{$alcaldeImageName}", $encodedImage);
+                $validatedData['alcalde_foto'] = "{$directory}/{$alcaldeImageName}";
             }
 
             $municipio = Municipio::create($validatedData);
@@ -122,60 +144,61 @@ class MunicipioController extends Controller
         try {
             $validatedData = $request->validated();
 
-            // Lógica para actualizar la imagen del mapa
-            if ($request->hasFile('mapa_imagen')) { // El campo del formulario es 'mapa'
-                // Eliminar imagen de mapa antigua si existe
-                if ($municipio->mapa_imagen) {
-                    if (Storage::disk('public')->exists($municipio->mapa_imagen)) {
-                        Storage::disk('public')->delete($municipio->mapa_imagen);
-                    }
+            $manager = new ImageManager(new Driver()); // Instancia el ImageManager
+
+            // Lógica para la imagen del mapa
+            if ($request->hasFile('mapa_imagen')) {
+                // Eliminar imagen antigua si existe
+                if ($municipio->mapa_imagen && Storage::disk('public')->exists($municipio->mapa_imagen)) {
+                    Storage::disk('public')->delete($municipio->mapa_imagen);
                 }
 
-                // Guardar la nueva imagen de mapa
+                $imageFile = $request->file('mapa_imagen');
                 $nombreSlug = \Illuminate\Support\Str::slug($validatedData['nombre'] ?? 'sin-nombre');
-                $extension = $request->file('mapa_imagen')->getClientOriginalExtension();
-                $imageName = $nombreSlug . '-mapa-' . time() . '.' . $extension;
+                $imageName = $nombreSlug . '-mapa-' . time() . '.jpg'; // Siempre .jpg
+                $directory = 'municipios/mapas';
 
-                $imagePath = $request->file('mapa_imagen')->storeAs('municipios/mapas', $imageName, 'public');
-                $validatedData['mapa_imagen'] = $imagePath;
-            } elseif (array_key_exists('mapa', $request->all()) && is_null($request->input('mapa'))) {
-                // Si 'mapa' se envió pero su valor es null, el cliente quiere eliminar la imagen.
-                if ($municipio->mapa_imagen) {
-                    if (Storage::disk('public')->exists($municipio->mapa_imagen)) {
-                        Storage::disk('public')->delete($municipio->mapa_imagen);
-                    }
+                $img = $manager->read($imageFile->getRealPath());
+                $img->scale(width: 1280);
+                $encodedImage = $img->toJpeg(75);
+
+                Storage::disk('public')->put("{$directory}/{$imageName}", $encodedImage);
+                $validatedData['mapa_imagen'] = "{$directory}/{$imageName}";
+            } elseif (array_key_exists('mapa_imagen', $request->all()) && is_null($request->input('mapa_imagen'))) {
+                if ($municipio->mapa_imagen && Storage::disk('public')->exists($municipio->mapa_imagen)) {
+                    Storage::disk('public')->delete($municipio->mapa_imagen);
                 }
                 $validatedData['mapa_imagen'] = null;
             } else {
-                // Si no se envió una nueva imagen y no se pidió eliminar, mantener la existente
                 $validatedData['mapa_imagen'] = $municipio->mapa_imagen;
             }
 
-
-            // Lógica existente para actualizar la foto del alcalde
+            // Lógica para la foto del alcalde
             if ($request->hasFile('alcalde_foto')) {
-                if ($municipio->alcalde_foto) {
-                    if (Storage::disk('public')->exists($municipio->alcalde_foto)) {
-                        Storage::disk('public')->delete($municipio->alcalde_foto);
-                    }
+                // Eliminar foto antigua si existe
+                if ($municipio->alcalde_foto && Storage::disk('public')->exists($municipio->alcalde_foto)) {
+                    Storage::disk('public')->delete($municipio->alcalde_foto);
                 }
-                $nombreAlcaldeSlug = \Illuminate\Support\Str::slug($validatedData['alcalde_nombre'] ?? 'sin-alcalde');
-                $extensionAlcalde = $request->file('alcalde_foto')->getClientOriginalExtension();
-                $alcaldeImageName = $nombreAlcaldeSlug . '-foto-' . time() . '.' . $extensionAlcalde;
 
-                $alcaldeImagePath = $request->file('alcalde_foto')->storeAs('municipios/alcaldes', $alcaldeImageName, 'public');
-                $validatedData['alcalde_foto'] = $alcaldeImagePath;
+                $imageFile = $request->file('alcalde_foto');
+                $nombreAlcaldeSlug = \Illuminate\Support\Str::slug($validatedData['alcalde_nombre'] ?? 'sin-alcalde');
+                $alcaldeImageName = $nombreAlcaldeSlug . '-foto-' . time() . '.jpg'; // Siempre .jpg
+                $directory = 'municipios/alcaldes';
+
+                $img = $manager->read($imageFile->getRealPath());
+                $img->scale(width: 1280);
+                $encodedImage = $img->toJpeg(75);
+
+                Storage::disk('public')->put("{$directory}/{$alcaldeImageName}", $encodedImage);
+                $validatedData['alcalde_foto'] = "{$directory}/{$alcaldeImageName}";
             } elseif (array_key_exists('alcalde_foto', $request->all()) && is_null($request->input('alcalde_foto'))) {
-                if ($municipio->alcalde_foto) {
-                    if (Storage::disk('public')->exists($municipio->alcalde_foto)) {
-                        Storage::disk('public')->delete($municipio->alcalde_foto);
-                    }
+                if ($municipio->alcalde_foto && Storage::disk('public')->exists($municipio->alcalde_foto)) {
+                    Storage::disk('public')->delete($municipio->alcalde_foto);
                 }
                 $validatedData['alcalde_foto'] = null;
             } else {
                 $validatedData['alcalde_foto'] = $municipio->alcalde_foto;
             }
-
 
             $municipio->update($validatedData);
 

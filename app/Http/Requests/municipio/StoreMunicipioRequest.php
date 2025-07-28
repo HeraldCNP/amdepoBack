@@ -42,13 +42,13 @@ class StoreMunicipioRequest extends FormRequest
             'sitio_web' => ['nullable', 'max:255'],
             'latitud' => ['nullable', 'numeric', 'between:-90,90'], // 'decimal' en DB
             'longitud' => ['nullable', 'numeric', 'between:-180,180'], // 'decimal' en DB
-            'mapa_imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // (max 5MB)
+            'mapa_imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10120', // (max 5MB)
             'poblacion' => ['nullable', 'integer', 'min:0'], // 'integer' en DB
             'superficie' => ['nullable', 'numeric', 'min:0'], // 'decimal' en DB
             'historia' => ['nullable', 'string'], // 'text' en DB se mapea a 'string' en validación
             'gentilicio' => ['nullable', 'string', 'max:255'],
             'alcalde_nombre' => ['nullable', 'string', 'max:255'],
-            'alcalde_foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+            'alcalde_foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:10048'],
             'circuscripcion' => ['nullable', 'string', 'max:255'],
             'comunidades' => ['nullable', 'string'], // Asumiendo que puede ser un texto largo
             'aniversario' => ['nullable', 'string'], // 'string' en DB, validamos formato MM-DD
