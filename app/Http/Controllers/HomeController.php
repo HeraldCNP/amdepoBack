@@ -128,4 +128,25 @@ class HomeController extends Controller
             return response()->json(['error' => 'Error al listar los proyectos.', 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function getNoticiaForSlug($slug): JsonResponse // Asegúrate de que el parámetro se llame $slug
+    {
+        try {
+            $noticia = Noticia::with(['user', 'categoria', 'imagenesNoticias'])
+                ->where('slug', $slug) // Buscar por slug
+                ->firstOrFail(); // Lanza 404 si no se encuentra
+
+            return response()->json(['data' => $noticia], 200);
+        } catch (ModelNotFoundException $e) {
+            // Si la noticia no se encuentra, devuelve un 404
+            return response()->json(['message' => 'Noticia no encontrada.'], 404);
+        } catch (Exception $e) {
+            // Para cualquier otro error inesperado
+            Log::error('Error al obtener noticia por slug: ' . $e->getMessage(), ['exception' => $e, 'slug' => $slug]);
+            return response()->json([
+                'message' => 'Ocurrió un error al intentar obtener la noticia.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

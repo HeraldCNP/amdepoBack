@@ -30,6 +30,8 @@ Route::group([
     Route::get('/circulares', [HomeController::class, 'getCirculares']);
     Route::get('/convenios', [HomeController::class, 'getConvenios']);
     Route::get('/proyectos', [HomeController::class, 'getProyectos']);
+    Route::get('/noticias/{slug}', [HomeController::class, 'getNoticiaForSlug']);
+
     // Route::get('/allPublicaciones', [HomeController::class, 'allPublicaciones']);
 });
 

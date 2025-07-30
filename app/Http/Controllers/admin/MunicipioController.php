@@ -78,7 +78,7 @@ class MunicipioController extends Controller
             // Lógica para la imagen del mapa
             if ($request->hasFile('mapa_imagen')) {
                 $imageFile = $request->file('mapa_imagen');
-                $nombreSlug = \Illuminate\Support\Str::slug($validatedData['nombre'] ?? 'sin-nombre');
+                $nombreSlug = Str::slug($validatedData['nombre'] ?? 'sin-nombre');
                 $imageName = $nombreSlug . '-mapa-' . time() . '.jpg'; // <-- Siempre .jpg
                 $directory = 'municipios/mapas';
 
@@ -97,7 +97,7 @@ class MunicipioController extends Controller
             // Lógica para la foto del alcalde
             if ($request->hasFile('alcalde_foto')) {
                 $imageFile = $request->file('alcalde_foto'); // Obtener el archivo de la solicitud
-                $nombreAlcaldeSlug = \Illuminate\Support\Str::slug($validatedData['alcalde_nombre'] ?? 'sin-alcalde');
+                $nombreAlcaldeSlug = Str::slug($validatedData['alcalde_nombre'] ?? 'sin-alcalde');
                 $alcaldeImageName = $nombreAlcaldeSlug . '-foto-' . time() . '.jpg'; // <-- Siempre .jpg
                 $directory = 'municipios/alcaldes';
 
@@ -154,7 +154,7 @@ class MunicipioController extends Controller
                 }
 
                 $imageFile = $request->file('mapa_imagen');
-                $nombreSlug = \Illuminate\Support\Str::slug($validatedData['nombre'] ?? 'sin-nombre');
+                $nombreSlug = Str::slug($validatedData['nombre'] ?? 'sin-nombre');
                 $imageName = $nombreSlug . '-mapa-' . time() . '.jpg'; // Siempre .jpg
                 $directory = 'municipios/mapas';
 
@@ -181,7 +181,7 @@ class MunicipioController extends Controller
                 }
 
                 $imageFile = $request->file('alcalde_foto');
-                $nombreAlcaldeSlug = \Illuminate\Support\Str::slug($validatedData['alcalde_nombre'] ?? 'sin-alcalde');
+                $nombreAlcaldeSlug = Str::slug($validatedData['alcalde_nombre'] ?? 'sin-alcalde');
                 $alcaldeImageName = $nombreAlcaldeSlug . '-foto-' . time() . '.jpg'; // Siempre .jpg
                 $directory = 'municipios/alcaldes';
 
@@ -225,7 +225,7 @@ class MunicipioController extends Controller
                 if (Storage::disk('public')->exists($municipio->alcalde_foto)) {
                     Storage::disk('public')->delete($municipio->alcalde_foto);
                     // Opcional: Logear que la foto fue eliminada, si es muy importante para tu monitoreo.
-                    // \Illuminate\Support\Facades\Log::info('Foto de alcalde eliminada para el municipio ' . $municipio->id . ': ' . $municipio->alcalde_foto);
+                    // Facades\Log::info('Foto de alcalde eliminada para el municipio ' . $municipio->id . ': ' . $municipio->alcalde_foto);
                 }
             }
 

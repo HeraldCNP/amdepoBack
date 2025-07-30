@@ -7,12 +7,14 @@ use App\Models\ImagenTuristica;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\imagenTuristica\StoreImagenTuristicaRequest;
 use App\Http\Requests\imagenTuristica\UpdateImagenTuristicaRequest;
+use App\Models\Municipio;
 use Illuminate\Support\Facades\Storage;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManager; // Importa ImageManager
 use Intervention\Image\Drivers\Gd\Driver; // Importa el Driver (Gd es común)
+use Illuminate\Support\Str;
 
 class ImagenTuristicaController extends Controller
 {
@@ -47,13 +49,21 @@ class ImagenTuristicaController extends Controller
             if ($request->hasFile('imagen_file')) {
                 $imageFile = $request->file('imagen_file');
                 $descripcionSlug = Str::slug($validatedData['descripcion'] ?? 'sin-descripcion');
-                $imageName = $descripcionSlug . '-' . time() . '.jpg'; // <-- Siempre .jpg
-                $directory = 'imagenes_turisticas';
+                $imageName = $descripcionSlug . '-' . time() . '.jpg'; // Siempre .jpg
+
+                // Obtener el municipio para usar su nombre en la carpeta
+                $municipioId = $validatedData['municipio_id'];
+                $municipio = Municipio::findOrFail($municipioId); // Busca el municipio por ID
+                $municipioSlug = Str::slug($municipio->nombre); // Genera un slug del nombre del municipio
+
+                // Define el directorio con el slug del nombre del municipio
+                $directory = "imagenes_turisticas/{$municipioSlug}"; // <-- Directorio con el slug del nombre del municipio
 
                 $img = $manager->read($imageFile->getRealPath()); // Lee el archivo
                 $img->scale(width: 1280); // Escala a un ancho máximo de 1280px
                 $encodedImage = $img->toJpeg(75); // Convierte y comprime a JPEG
 
+                // Guarda la imagen en la nueva estructura de carpetas
                 Storage::disk('public')->put("{$directory}/{$imageName}", $encodedImage);
                 $validatedData['ruta_imagen'] = "{$directory}/{$imageName}"; // Guarda la ruta completa
             }
