@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use App\Models\Circular;
 use App\Models\Convenio;
 use App\Models\Documento;
@@ -145,6 +146,22 @@ class HomeController extends Controller
             Log::error('Error al obtener noticia por slug: ' . $e->getMessage(), ['exception' => $e, 'slug' => $slug]);
             return response()->json([
                 'message' => 'Ocurrió un error al intentar obtener la noticia.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getCategorias(): JsonResponse
+    {
+        try {
+            // Obtener todas las categorías, ordenadas por nombre
+            $categorias = Categoria::orderBy('nombre')->get();
+
+            return response()->json(['data' => $categorias], 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener categorías en HomeController: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'message' => 'Ocurrió un error al intentar obtener las categorías.',
                 'error' => $e->getMessage()
             ], 500);
         }

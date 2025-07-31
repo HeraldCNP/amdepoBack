@@ -31,7 +31,7 @@ Route::group([
     Route::get('/convenios', [HomeController::class, 'getConvenios']);
     Route::get('/proyectos', [HomeController::class, 'getProyectos']);
     Route::get('/noticias/{slug}', [HomeController::class, 'getNoticiaForSlug']);
-
+    Route::get('/categorias', [HomeController::class, 'getCategorias']);
     // Route::get('/allPublicaciones', [HomeController::class, 'allPublicaciones']);
 });
 
