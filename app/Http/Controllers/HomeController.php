@@ -33,15 +33,17 @@ class HomeController extends Controller
         }
     }
 
-    public function getNoticias(Request $request): JsonResponse // O podrías usar un método llamado listarPublicos
+    public function getNoticias(Request $request): JsonResponse
     {
         try {
             $perPage = request()->query('per_page', 9);
             $searchTerm = request()->query('search');
-            $limit = request()->query('limit'); // <-- Nuevo: Obtiene el parámetro 'limit'
+            $limit = request()->query('limit');
+            // <-- Nuevo: Obtiene el parámetro 'categoria' de la solicitud
+            $categorySlug = request()->query('categoria');
 
             $query = Noticia::with(['user', 'categoria', 'imagenesNoticias'])
-                ->orderBy('created_at', 'desc'); // Ya tienes el orden descendente, lo cual es bueno para "últimas"
+                ->orderBy('created_at', 'desc');
 
             // Aplica el filtro de búsqueda si se proporciona un término
             if ($searchTerm) {
@@ -57,11 +59,18 @@ class HomeController extends Controller
                 });
             }
 
-            // <-- Nuevo: Maneja el parámetro 'limit'
+            // <-- Nuevo: Aplica el filtro de categoría si se proporciona el slug
+            if ($categorySlug) {
+                $query->whereHas('categoria', function ($q) use ($categorySlug) {
+                    $q->where('slug', $categorySlug);
+                });
+            }
+
+            // Aplica el límite o la paginación según corresponda
             if ($limit) {
-                $noticias = $query->limit($limit)->get(); // Si hay límite, usa get() en lugar de paginate()
+                $noticias = $query->limit($limit)->get();
             } else {
-                $noticias = $query->paginate($perPage); // Si no hay límite, usa paginación normal
+                $noticias = $query->paginate($perPage);
             }
 
             return response()->json($noticias);
