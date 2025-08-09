@@ -32,7 +32,7 @@ Route::group([
     Route::get('/proyectos', [HomeController::class, 'getProyectos']);
     Route::get('/noticias/{slug}', [HomeController::class, 'getNoticiaForSlug']);
     Route::get('/categorias', [HomeController::class, 'getCategorias']);
-    // Route::get('/allPublicaciones', [HomeController::class, 'allPublicaciones']);
+    Route::get('/dashboard-totals', [HomeController::class, 'getDashboardTotals']);
 });
 
 // Rutas protegidas (requieren autenticación JWT)
@@ -51,6 +51,8 @@ Route::group([
     Route::get('/users/{id}', [AuthController::class, 'show'])->name('users.show');
     Route::delete('/users/{id}', [AuthController::class, 'destroy'])->name('users.destroy');
     Route::get('/user/search', [AuthController::class, 'searchUsers']);
+
+
 });
 
 Route::group([

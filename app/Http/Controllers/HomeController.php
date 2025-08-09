@@ -10,11 +10,13 @@ use App\Models\Municipio;
 use App\Models\Noticia;
 use App\Models\Proyecto;
 use App\Models\Publicacion;
+use App\Models\User;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
 
 class HomeController extends Controller
 {
@@ -171,6 +173,30 @@ class HomeController extends Controller
             Log::error('Error al obtener categorías en HomeController: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json([
                 'message' => 'Ocurrió un error al intentar obtener las categorías.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getDashboardTotals(): JsonResponse
+    {
+        try {
+            $totals = [
+                'totalUsuarios' => User::count(),
+                'totalRoles' => Role::count(),
+                'totalMunicipios' => Municipio::count(),
+                'totalDocumentos' => Documento::count(), // Debes especificar el modelo para "Documentos"
+                'totalCirculares' => Circular::count(),
+                'totalConvenios' => Convenio::count(),
+                'totalCategorias' => Categoria::count(),
+                'totalPublicaciones' => Noticia::count(), // Asumiendo que "Publicaciones" es el modelo Noticia
+            ];
+
+            return response()->json(['data' => $totals], 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener totales del dashboard: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'message' => 'Ocurrió un error al intentar obtener los totales del dashboard.',
                 'error' => $e->getMessage()
             ], 500);
         }
